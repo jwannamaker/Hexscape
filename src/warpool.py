@@ -21,29 +21,19 @@ main_window.set_fullscreen(True)
 main_batch = pyglet.graphics.Batch()
 
 circle_manager = Circle()
-font_manager = Font(main_window.width, main_window.height, main_batch)
+font_manager = Font(64, 128, main_window.width, main_window.height, main_batch)
 button_manager = Button(main_window)
 
 
-def on_button_press():
-    print('Da button was pressed yknow')
-    
-def on_button_release():
-    print('Da button was released yknow')
-
 def setup():
-    button = button_manager.make_button(0, 0, main_batch)
-    button.set_handler('on_press', on_button_press)
-    button.set_handler('on_release', on_button_release)
+    font_manager.write('WARPOOL', 0, main_window.height-128)
 
 
 @main_window.event
 def on_key_press(symbol, modifiers):
-    if symbol == key.P and modifiers & key.MOD_SHIFT:
+    if key.MOD_CTRL & modifiers:
         screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
         pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
-    if symbol == key.A:
-        font_manager.write('testing testing testing testing testing testing testing', 0, main_window.height - 128)
         
 @main_window.event
 def on_mouse_press(x, y, button, modifiers):
