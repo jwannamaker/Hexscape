@@ -20,7 +20,7 @@ main_window.set_fullscreen(True)
 main_batch = pyglet.graphics.Batch()
 
 circle_manager = Circle()
-font_manager = Font(main_batch)
+font_manager = Font(main_window.width, main_window.height, main_batch)
 
 @main_window.event
 def on_key_press(symbol, modifiers):
@@ -28,18 +28,8 @@ def on_key_press(symbol, modifiers):
         screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
         pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
     if symbol == key.A:
-        # char_image = pyglet.resource.image('A.png')
-        font_manager.write('123', main_window.width//2, main_window.height//2)
-    if symbol == key.B:
         # char_image = pyglet.resource.image('B.png')
-        font_manager.write('ABC', 0, 0)
-    if symbol == key.C:
-        # char_image = pyglet.resource.image('C.png')
-        font_manager.write('DEF', 3*128, 0)
-    if symbol == key.D:
-        # char_image = pyglet.resource.image('D.png')
-        font_manager.write('GHI', 6*128, 0)
-    # text.append(pyglet.sprite.Sprite(img=char_image, x=0, y=0, batch=main_batch))
+        font_manager.write('testing testing testing testing testing testing testing', 0, main_window.height - 128)
         
 
 @main_window.event
