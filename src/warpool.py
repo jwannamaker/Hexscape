@@ -7,12 +7,13 @@ from pyglet.window import key, mouse
 
 from circle import Circle
 from font import Font
+from button import Button
 
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
-pyglet.resource.path = ['../resources', '../resources/font']
+pyglet.resource.path = ['../resources', '../resources/font', '../resources/button']
 pyglet.resource.reindex()
 
 main_window = pyglet.window.Window()
@@ -21,6 +22,20 @@ main_batch = pyglet.graphics.Batch()
 
 circle_manager = Circle()
 font_manager = Font(main_window.width, main_window.height, main_batch)
+button_manager = Button(main_window)
+
+
+def on_button_press():
+    print('Da button was pressed yknow')
+    
+def on_button_release():
+    print('Da button was released yknow')
+
+def setup():
+    button = button_manager.make_button(0, 0, main_batch)
+    button.set_handler('on_press', on_button_press)
+    button.set_handler('on_release', on_button_release)
+
 
 @main_window.event
 def on_key_press(symbol, modifiers):
@@ -28,10 +43,8 @@ def on_key_press(symbol, modifiers):
         screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
         pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
     if symbol == key.A:
-        # char_image = pyglet.resource.image('B.png')
         font_manager.write('testing testing testing testing testing testing testing', 0, main_window.height - 128)
         
-
 @main_window.event
 def on_mouse_press(x, y, button, modifiers):
     """ Possible values:
@@ -53,8 +66,8 @@ def on_mouse_scroll(x, y, scroll_x, scroll_y):
 def on_draw():
     main_window.clear()
     main_batch.draw()
-    # for letter in text:
-        # letter.draw()
+    
 
 if __name__ == '__main__':
+    setup()
     pyglet.app.run()
