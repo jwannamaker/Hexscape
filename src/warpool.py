@@ -22,12 +22,9 @@ def on_key_press(symbol, modifiers):
     if symbol == key.P and modifiers & key.MOD_SHIFT:
         screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
         pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
-    if symbol == key.A:
-        Font('A', 0, main_window.height-128, main_batch)
-    if symbol == key.B:
-        Font('B', 0, main_window.height-128, main_batch)
-    if symbol == key.C:
-        Font('C', 0, main_window.height-128, main_batch)
+    # print(symbol)
+    # print(key[symbol])
+    # Font(key[symbol], 0, 0, main_batch)
 
 @main_window.event
 def on_mouse_press(x, y, button, modifiers):
