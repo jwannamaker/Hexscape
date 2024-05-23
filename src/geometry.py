@@ -1,6 +1,7 @@
+from enum import Enum
+
 import numpy as np
 import pyglet
-import matplotlib.pyplot as plt
 
 def x_rotation(point, angle):
     theta = np.deg2rad(angle)
@@ -49,13 +50,14 @@ def hexagon(center_x, center_y, radius, batch):
         vertices.append([x, y])
         
     hexagon = pyglet.shapes.Polygon(*vertices, batch=batch)
-    return hexagon
+    border = pyglet.shapes.MultiLine(*vertices, thickness=5, color=(200, 200, 200), batch=batch)
+    return border
 
-class Tile:
-    def __init__(self, batch):
-        self.batch = batch
-        self.tiles = []
-    
-    def draw(self, vertices):
-        self.tiles.append(pyglet.shapes.Polygon(vertices, batch=self.batch))
-        
+class HexGrid:
+    class Neighbors(Enum):
+        UP_RIGHT = []
+        UP = []
+        UP_LEFT = []
+        DOWN_LEFT = []
+        DOWN = []
+        DOWN_RIGHT = []
