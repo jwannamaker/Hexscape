@@ -1,4 +1,5 @@
-from enum import Enum
+from dataclasses import dataclass
+from collections import namedtuple
 
 import numpy as np
 import pyglet
@@ -24,19 +25,6 @@ def z_rotation(point, angle):
                     [0, 0, 1]])
     return np.matmul(rot_z, point)
 
-def square(center_x, center_y, radius, batch):
-    """ Reusing code from PolyBounce """
-    step = 60 # degrees
-    start = (180 - step) / 2  # Orients polygon to have a flat ass
-    stop = start + 360 + step
-    angles = np.arange(np.deg2rad(start), np.deg2rad(stop), np.deg2rad(step))
-    vertices = np.full((7), 0.0)
-    for i, point in enumerate(vertices):
-        point[0] = np.cos(angles[i]), np.sin(angles[i])
-        
-    hexagon = pyglet.shapes.Polygon(vertices, batch=batch)
-    return hexagon
-
 def hexagon(center_x, center_y, radius, batch):
     """ Reusing code from PolyBounce """
     step = 60 # degrees
@@ -53,11 +41,23 @@ def hexagon(center_x, center_y, radius, batch):
     border = pyglet.shapes.MultiLine(*vertices, thickness=5, color=(200, 200, 200), batch=batch)
     return border
 
+
+@dataclass
+class Hex:
+    """ Flat-topped hexagon. """
+    Neighbors = {
+        'UP_RIGHT': (),
+        'UP': (),
+        'UP_LEFT': (),
+        'DOWN_LEFT': (),
+        'DOWN': (),
+        'DOWN_RIGHT': ()
+    }
+    
+    def __init__(self, radius):
+        
+
 class HexGrid:
-    class Neighbors(Enum):
-        UP_RIGHT = []
-        UP = []
-        UP_LEFT = []
-        DOWN_LEFT = []
-        DOWN = []
-        DOWN_RIGHT = []
+    
+        
+    
