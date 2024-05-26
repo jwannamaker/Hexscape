@@ -105,8 +105,24 @@ class HexOrientation:
         if direction in HexOrientation.DIAGONAL_DIRECTION:
             return hex + HexOrientation.DIAGONAL_DIRECTION(direction)
         return hex
-    
+
+class HexLayout:
+    def __init__(self):
+        self.HexTiles = {}
         
+    def nearby(self, hex: Hex, search_distance: int):
+        """ Returns all nearby tiles within the given search_distance. """
+        results = []
+        for q in range(-search_distance, search_distance, 1):
+            # Find only the revelvant values for r to iterate over, considering
+            # q + r + s == 0
+            start_r = max(-search_distance, -q - search_distance)
+            stop_r = min(search_distance, -q + search_distance)
+            for r in range(start_r, stop_r, 1):
+                s = -q - r
+                results.append(hex + Hex(q, r, s))
+        return results
+            
 """
 Horizontal distance between two adjacent flat top regular hexagons
     h = 3/4 * WIDTH = 3/2 * RADIUS
