@@ -10,8 +10,9 @@ from dataclasses import dataclass, field
 from collections import namedtuple
 import operator
 
-import numpy as np
 import pyglet
+import numpy as np
+from numpy.linalg import inv
 
 def x_rotation(point, angle):
     theta = np.deg2rad(angle)
@@ -55,28 +56,58 @@ class Hex:
     def distance_to(self, other: 'Hex'):
         return self.length(self - other)
     
+    def vector(self):
+        return np.row_stack([self.q, self.r])
+
+    @staticmethod
+    def round(frac_q: float, frac_r: float, frac_s: float):
+        q = round(q)
+        r = round(r)
+        s = round(s)
+        
+        q_diff = abs(q - frac_q)
+        r_diff = abs(r - frac_r)
+        s_diff = abs(s - frac_s)
+        
+        if q_diff > r_diff and q_diff > s_diff:
+            q = -r - s
+        elif r_diff > s_diff:
+            r = -q - s
+        else:
+            s = -q - r
+        return Hex(q, r, s)
 
 class HexOrientation:
     def __init__(self, origin_x: int, origin_y: int, radius: int = 64, flat_top: bool = True):
         """ (origin_x, origin_y): screen coordinate for center of Hex(0, 0, 0). """
         self._radius = radius
-        self._width = 2 * self.radius
+        self._width = 2 * self._radius
         self._height = np.sqrt(3) * self._radius
 
-        self.i = 3 / 2 * self._radius
-        self.j = np.sqrt(3) / 2 * self._radius
+        self._origin = np.row_stack([origin_x, origin_y])
+        self._i = np.array([3 / 2,  np.sqrt(3) / 2])
+        self._j = np.array([0,      np.sqrt(3)])
+        self._hex_to_pixel = np.column_stack([self._i, self._j])
 
         if flat_top:
             step = 60 # degrees
             start = (180 - step) / 2  # flat top orientation
             stop = start + 360 + step
-        self.CORNER_ANGLES = np.arange(start, stop, step)
+        self._corner_angles = np.arange(start, stop, step)
+
+    def center(self, hex: Hex):
+        """ Return the center of the hex in pixel coordinates. """
+        
+        result = self._radius * self._pixel_transformation_matrix @ hex.vector()
+        return result + self._origin
 
     def corners(self, hex):
         corners = []
-        for angle in self.CORNER_ANGLES:
-            x = self._radius * np.cos(np.deg2rad(angle)) + hex()
-            y = self._radius * np.sin(np.deg2rad(angle)) + hex()
+        center_x, center_y = self.center(hex)
+        
+        for angle in self._corner_angles:
+            x = self._radius * np.cos(np.deg2rad(angle)) + center_x
+            y = self._radius * np.sin(np.deg2rad(angle)) + center_y
             corners.append((x, y))
         return corners
 
@@ -104,10 +135,10 @@ class HexOrientation:
             return hex + HexOrientation.ADJACENT_DIRECTION(direction)
         if direction in HexOrientation.DIAGONAL_DIRECTION:
             return hex + HexOrientation.DIAGONAL_DIRECTION(direction)
-        return hex
-
+        return hex # No neighbor was found, so return the original coordinate
+    
 class HexLayout:
-    def __init__(self):
+    def __init__(self, orientation: HexOrientation, batch: pyglet.graphics.Batch):
         self.HexTiles = {}
         
     def nearby(self, hex: Hex, search_distance: int):
@@ -130,7 +161,7 @@ class HexLayout:
     
 
 if __name__ == '__main__':
-    orientation = HexOrientation()
+    orientation = HexOrientation(0, 0, 10)
     bestagon = Hex(0, 0, 0)
-    orientation.corners(bestagon)
-    print(bestagon)
+    print(orientation.corners(bestagon))
+    

@@ -8,7 +8,7 @@ from pyglet.window import key, mouse
 from circle import Circle
 from font import Font
 from button import Button
-import geometry
+from geometry import Hex, HexOrientation, HexLayout
 
 
 gl.glEnable(gl.GL_BLEND)
@@ -24,10 +24,9 @@ main_batch = pyglet.graphics.Batch()
 circle_manager = Circle()
 font_manager = Font(64, 128, main_window.width, main_window.height, main_batch)
 button_manager = Button(main_window)
-tile_manager = geometry.Tile(main_batch)
 
 font_manager.write('WARPOOL', 0, main_window.height-128)
-hexagon = geometry.hexagon(main_window.width/2, main_window.height/2, 64, main_batch)
+hexagon = HexOrientation(main_window.width/2, main_window.height/2)
 
 @main_window.event
 def on_key_press(symbol, modifiers):
