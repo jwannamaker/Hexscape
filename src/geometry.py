@@ -41,6 +41,27 @@ def z_rotation(point, angle):
 #     hexagon = pyglet.shapes.Polygon(*vertices, batch=batch)
 #     border = pyglet.shapes.MultiLine(*vertices, thickness=5, color=(200, 200, 200), batch=batch)
 #     return border
+@dataclass
+class Hex:
+    q: int
+    r: int
+    s: int
+    
+    def __post_init__(self):
+        assert(self.q + self.r + self.s == 0); 'Invalid: q + r + s != 0'
+    
+    def __add__(self, other: 'Hex'):
+        return Hex(self.q + other.q, self.r + other.r, self.s + other.s)
+    
+    def __sub__(self, other: 'Hex'):
+        return Hex(self.q - other.q, self.r - other.r, self.s - other.s)
+    
+    def length(self):
+        return (abs(self.q) + abs(self.r) + abs(self.s)) // 2
+    
+    def distance_to(self, other: 'Hex'):
+        return self.length(self - other)
+    
 
 class HexOrientation:
     def __init__(self, radius=64, flat_top=True):
@@ -57,29 +78,34 @@ class HexOrientation:
             stop = start + 360 + step
         self.CORNER_ANGLES = np.arange(start, stop, step)
 
+    def corners(self, hex):
+        return
+
     ADJACENT_DIRECTION = {
-        'UP_RIGHT':   (+1, -1,  0), 
-        'UP':         ( 0, -1, +1), 
-        'UP_LEFT':    (-1,  0, +1),
-        'DOWN_RIGHT': (-1, +1,  0), 
-        'DOWN':       ( 0, +1, -1), 
-        'DOWN_LEFT':  (+1,  0, -1)
+        'UP_RIGHT':   Hex(+1, -1,  0), 
+        'UP':         Hex( 0, -1, +1), 
+        'UP_LEFT':    Hex(-1,  0, +1),
+        'DOWN_RIGHT': Hex(-1, +1,  0), 
+        'DOWN':       Hex( 0, +1, -1), 
+        'DOWN_LEFT':  Hex(+1,  0, -1)
     }
-    
-    def adjacent_neighbor(self, hex, direction):
-        return 
     
     DIAGONAL_DIRECTION = {
-        'RIGHT':      (+2, -1, -1),
-        'UP_RIGHT':   (+1, -2, +1),
-        'UP_LEFT':    (-1, -1, +2),
-        'LEFT':       (-2, +1, +1),
-        'DOWN_LEFT':  (-1, +2, -1),
-        'DOWN_RIGHT': (+1, +1, -2)
+        'RIGHT':      Hex(+2, -1, -1),
+        'UP_RIGHT':   Hex(+1, -2, +1),
+        'UP_LEFT':    Hex(-1, -1, +2),
+        'LEFT':       Hex(-2, +1, +1),
+        'DOWN_LEFT':  Hex(-1, +2, -1),
+        'DOWN_RIGHT': Hex(+1, +1, -2)
     }
     
-    def diagonal_neighbor(self, hex, diagonal):
-        return
+    def neighbor(self, hex: Hex, direction: str):
+        if direction in HexOrientation.ADJACENT_DIRECTION:
+            return hex + HexOrientation.ADJACENT_DIRECTION(direction)
+        if direction in HexOrientation.DIAGONAL_DIRECTION:
+            return hex + HexOrientation.DIAGONAL_DIRECTION(direction)
+        return hex
+    
         
 """
 Horizontal distance between two adjacent flat top regular hexagons
@@ -89,44 +115,6 @@ Vertical distance between two adjacent flat top regular hexagons
     v = HEIGHT = sqrt(3) * radius
 """
 
-@dataclass
-class Hex:
-    q: int
-    r: int
-    s: int
-    
-    def __post_init__(self):
-        assert(self.q + self.r + self.s == 0); 'Invalid: q + r + s must be zero'
-    
-    def __add__(self, other: 'Hex'):
-        return Hex(self.q + other.q, self.r + other.r, self.s + other.s)
-    
-    def __sub__(self, other: 'Hex'):
-        return Hex(self.q - other.q, self.r - other.r, self.s - other.s)
-    
-    def length(self):
-        return (abs(self.q) + abs(self.r) + abs(self.s)) // 2
-    
-    def distance_to(self, other: 'Hex'):
-        return self.length(self - other)
-    
-    def up_right(self):
-        return operator.add(self, Hex(+1, -1, 0))
-    
-    def up(self):
-        return operator.add(self, Hex(0, -1, +1))
-    
-    def up_left(self):
-        return operator.add(self, Hex(-1, 0, +1))
-    
-    def down_left(self):
-        return operator.add(self, Hex(-1, +1, 0))
-    
-    def down(self):
-        return operator.add(self, Hex(0, +1, -1))
-    
-    def down_right(self):
-        return operator.add(self, Hex(+1, 0, -1))
     
     
 @dataclass
