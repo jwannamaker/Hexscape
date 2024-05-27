@@ -58,9 +58,9 @@ class Hex:
         return np.row_stack([self.q, self.r])
 
 class HexOrientation:
-    radius = 64
-    width = 2 * radius
-    height = np.sqrt(3) * radius
+    # radius = 64
+    # width = 2 * radius
+    # height = np.sqrt(3) * radius
     
     i = np.array([3 / 2,  np.sqrt(3) / 2])
     j = np.array([0,      np.sqrt(3)])
@@ -69,15 +69,13 @@ class HexOrientation:
     corner_angles = np.arange(0, 360, 60)
 
     @staticmethod
-    def center(radius, hex: Hex):
-        """ Return the center of the hex in pixel coordinates. """
-        return radius * HexOrientation.hex_to_pixel @ hex.vector()
+    def center(hex: Hex, radius: int, origin: np.ndarray):
+        """ Return the center of the hexagon in pixel coordinates. """
+        return ((radius * HexOrientation.hex_to_pixel) @ hex.vector()) + origin
 
     @staticmethod
-    def corners(radius, hex):
+    def corners(radius: int, center_x: int, center_y: int):
         corners = []
-        center_x, center_y = HexOrientation.center(radius, hex)
-        
         for angle in HexOrientation.corner_angles:
             x = radius * np.cos(np.deg2rad(angle)) + center_x
             y = radius * np.sin(np.deg2rad(angle)) + center_y
@@ -137,20 +135,21 @@ class HexGrid:
         self._batch = batch
         
         self._tiles = {}
-        for q in range(-self._grid_size, self._grid_size, 1):
+        for q in range(-self._grid_size, self._grid_size + 1, 1):
             start_r = max(-self._grid_size, -q - self._grid_size)
             stop_r = min(self._grid_size, -q + self._grid_size)
-            for r in range(start_r, stop_r, 1):
+            for r in range(start_r, stop_r + 1, 1):
                 s = -q - r
                 new_tile = Hex(q, r, s)
                 self._tiles[new_tile] = self.tile(new_tile)
     
     def tile(self, hex: Hex):
         """ Eventually return a sprite of the tile. """
-        background = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius, hex),
+        center_x, center_y = HexOrientation.center(hex, 64, self._origin)
+        background = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius, center_x, center_y),
                                            color=(255, 100, 67, 255),
                                            batch=self._batch)
-        foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 10, hex),
+        foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 10, center_x, center_y),
                                            color=(0, 0, 0, 255),
                                            batch=self._batch)
         return [background, foreground]
@@ -161,12 +160,12 @@ class HexGrid:
         Note: The coordinates WILL need to be validated by the map.
         """
         results = []
-        for q in range(-search_distance, search_distance, 1):
+        for q in range(-search_distance, search_distance + 1, 1):
             # Find only the revelvant values for r to iterate over, considering
             # q + r + s == 0
             start_r = max(-search_distance, -q - search_distance)
             stop_r = min(search_distance, -q + search_distance)
-            for r in range(start_r, stop_r, 1):
+            for r in range(start_r, stop_r + 1, 1):
                 s = -q - r
                 results.append(hex + Hex(q, r, s))
         return results
