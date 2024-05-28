@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from collections import namedtuple
 import operator
+import random
 
 import pyglet
 import numpy as np
@@ -182,9 +183,12 @@ class HexGrid:
     def highlight(self, screen_x, screen_y):
         # screen_pos = np.row_stack([screen_x, screen_y])
         for tile in self._tiles.values():
-            print(f'value: {tile}')
             if (screen_x, screen_y) in tile[0]:
                 tile[0].color = (255, 255, 255, 255)
+                tile[1].color = (random.randint(100, 200), 
+                                 random.randint(50, 255),
+                                 random.randint(0, 100), 
+                                 255)
     
 
 # if __name__ == '__main__':
