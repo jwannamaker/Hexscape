@@ -181,7 +181,6 @@ class HexGrid:
         return key in self._tiles
     
     def highlight(self, screen_x, screen_y):
-        # screen_pos = np.row_stack([screen_x, screen_y])
         for tile in self._tiles.values():
             if (screen_x, screen_y) in tile[0]:
                 tile[0].color = (255, 255, 255, 255)
@@ -189,7 +188,8 @@ class HexGrid:
                                  random.randint(50, 255),
                                  random.randint(0, 100), 
                                  255)
-    
+            
+            
 
 # if __name__ == '__main__':
     # test_grid = HexGrid()
