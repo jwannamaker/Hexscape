@@ -43,8 +43,9 @@ def on_mouse_press(x, y, button, modifiers):
         pyglet.window.mouse.RIGHT
     """
     if button == mouse.LEFT:
-        circle_manager.draw_circle(x, y, main_batch)
-        
+        # circle_manager.draw_circle(x, y, main_batch)
+        grid.highlight(x, y)
+
 
 @main_window.event
 def on_mouse_scroll(x, y, scroll_x, scroll_y):

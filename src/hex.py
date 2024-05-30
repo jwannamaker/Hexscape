@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from collections import namedtuple
 import operator
+import random
 
 import pyglet
 import numpy as np
@@ -65,6 +66,7 @@ class HexOrientation:
     i = np.array([3 / 2,  np.sqrt(3) / 2])
     j = np.array([0,      np.sqrt(3)])
     hex_to_pixel = np.column_stack([i, j])
+    pixel_to_hex = np.linalg.inv(hex_to_pixel)
     
     corner_angles = np.arange(0, 360, 60)
 
@@ -82,6 +84,11 @@ class HexOrientation:
             corners.append((x, y))
         return corners
 
+    @staticmethod
+    def convert_to_hex(radius: int, screen_pos: np.ndarray, origin: np.ndarray):
+        """ Convert the screen coordinate to a hexagon coordinate. """
+        return HexOrientation.round(((screen_pos - origin) / radius) @ HexOrientation.pixel_to_hex)
+    
     ADJACENT_DIRECTION = {
         'UP_RIGHT':   Hex(+1, -1,  0), 
         'UP':         Hex( 0, -1, +1), 
@@ -169,9 +176,19 @@ class HexGrid:
                 s = -q - r
                 results.append(hex + Hex(q, r, s))
         return results
-            
 
+    def __contains__(self, key: Hex):
+        return key in self._tiles
     
+    def highlight(self, screen_x, screen_y):
+        # screen_pos = np.row_stack([screen_x, screen_y])
+        for tile in self._tiles.values():
+            if (screen_x, screen_y) in tile[0]:
+                tile[0].color = (255, 255, 255, 255)
+                tile[1].color = (random.randint(100, 200), 
+                                 random.randint(50, 255),
+                                 random.randint(0, 100), 
+                                 255)
 
 # if __name__ == '__main__':
     # test_grid = HexGrid()
