@@ -176,7 +176,7 @@ class HexGrid:
                 s = -q - r
                 results.append(hex + Hex(q, r, s))
         return results
-    
+
     def __contains__(self, key: Hex):
         return key in self._tiles
     
@@ -189,7 +189,6 @@ class HexGrid:
                                  random.randint(50, 255),
                                  random.randint(0, 100), 
                                  255)
-    
 
 # if __name__ == '__main__':
     # test_grid = HexGrid()
