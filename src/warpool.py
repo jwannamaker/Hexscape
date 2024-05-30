@@ -8,7 +8,7 @@ from pyglet.window import key, mouse
 from circle import Circle
 from font import Font
 from button import Button
-from geometry import HexGrid
+from hex import HexGrid
 
 
 gl.glEnable(gl.GL_BLEND)

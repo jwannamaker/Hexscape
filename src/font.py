@@ -34,9 +34,8 @@ class Font:
                 letter_sprite.scale_x = self.size_x / letter_sprite.width
                 
                 self.text.append(letter_sprite)
-                
-                # draw a box around the letter for the desired dimensions
-                self.border_boxes.append(pyglet.shapes.Box(x, y, self.size_x, self.size_y, 5, batch=self.batch))
+                self.border_boxes.append(pyglet.shapes.Box(x, y, self.size_x, self.size_y, 
+                                                           5, batch=self.batch))
             if x + self.size_x <= self.max_x:
                 x += self.size_x
             else:
