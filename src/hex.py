@@ -5,7 +5,9 @@ import random
 
 import pyglet
 import numpy as np
-from numpy.linalg import inv
+
+from resources import palette
+from player import Player
 
 def x_rotation(point, angle):
     theta = np.deg2rad(angle)
@@ -152,12 +154,12 @@ class HexGrid:
     
     def tile(self, hex: Hex):
         """ Eventually return a sprite of the tile. """
-        center_x, center_y = HexOrientation.center(hex, 64, self._origin)
+        center_x, center_y = HexOrientation.center(hex, self._radius, self._origin)
         background = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius, center_x, center_y),
-                                           color=(255, 100, 67, 255),
+                                           color=palette['blue'][1],
                                            batch=self._batch)
-        foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 10, center_x, center_y),
-                                           color=(0, 0, 0, 255),
+        foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 4, center_x, center_y),
+                                           color=palette['blue'][0],
                                            batch=self._batch)
         return [background, foreground]
         
@@ -180,17 +182,20 @@ class HexGrid:
     def __contains__(self, key: Hex):
         return key in self._tiles
     
-    def highlight(self, screen_x, screen_y):
-        # screen_pos = np.row_stack([screen_x, screen_y])
+    def highlight(self, screen_x: int, screen_y: int):
         for tile in self._tiles.values():
             if (screen_x, screen_y) in tile[0]:
-                tile[0].color = (255, 255, 255, 255)
-                tile[1].color = (random.randint(100, 200), 
-                                 random.randint(50, 255),
-                                 random.randint(0, 100), 
-                                 255)
-    
-
-# if __name__ == '__main__':
-    # test_grid = HexGrid()
-    
+                tile[0].color = palette['purple'][3]
+                tile[1].color = palette['purple'][2]
+            else:
+                tile[0].color = palette['blue'][1]
+                tile[1].color = palette['blue'][0]
+                
+    def highlight_again(self, screen_x: int, screen_y: int):
+        for tile in self._tiles.values():
+            if (screen_x, screen_y) in tile:
+                tile[0].color = palette['blue'][2]
+                tile[1].color = palette['blue'][3]
+            else:
+                tile[0].color = palette['blue'][1]
+                tile[1].color = palette['blue'][0]
