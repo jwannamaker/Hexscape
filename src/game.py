@@ -1,5 +1,6 @@
 import datetime
 import time
+from collections import namedtuple
 
 import pyglet
 from pyglet import gl
@@ -42,21 +43,29 @@ def on_key_press(symbol, modifiers):
     
     if key.W:
         grid.move_player('UP')
+        print('UP')
     if key.W & key.A:
-        grid.move_player('UP_LEFT')
+        
+        print('UP_LEFT')
     if key.A:
-        grid.move_player('LEFT')
+        # grid.move_player('LEFT')
+        print('LEFT')
     if key.A & key.S:
-        grid.move_player('DOWN_LEFT')
+        # grid.move_player('DOWN_LEFT')
+        print('DOWN_LEFT')
     if key.S:
-        grid.move_player('DOWN')
+        # grid.move_player('DOWN')
+        print('DOWN')
     if key.S & key.D:
-        grid.move_player('DOWN_RIGHT')
+        # grid.move_player('DOWN_RIGHT')
+        print('DOWN_RIGHT')
     if key.D:
-        grid.move_player('RIGHT')
+        # grid.move_player('RIGHT')
+        print('RIGHT')
     if key.W & key.D:
-        grid.move_player('UP_RIGHT')
-
+        # grid.move_player('UP_RIGHT')
+        print('UP_RIGHT')
+    
 
 @main_window.event
 def on_mouse_press(x, y, button, modifiers):
