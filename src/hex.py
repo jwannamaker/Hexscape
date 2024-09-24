@@ -136,17 +136,16 @@ class HexOrientation:
         return Hex(q, r, s)
 
 
-class Player:
-    def __init__(self, initial_position: Hex):
-        self._hex = initial_position
-        self._color = palette['red'][0]
+# class Player:
+#     def __init__(self, initial_position: Hex):
+#         self._hex = initial_position
+#         self._color = palette['red'][0]
         
-    def place(self, new_position):
-        self._hex = new_position
+#     def place(self, new_position):
+#         self._hex = new_position
         
-    def move(self, direction: str):
-        self._hex = HexOrientation.neighbor(self._hex, direction)
-
+#     def move(self, direction: str):
+#         self._hex = HexOrientation.neighbor(self._hex, direction)
 
 class HexGrid:
     """ 
@@ -162,7 +161,6 @@ class HexGrid:
         self._origin = np.row_stack([origin_x, origin_y])
         self._batch = batch
         
-        self.player = Player(Hex(0, 0, 0))
         
         self._tiles = {}
         for q in range(-self._grid_size, self._grid_size + 1, 1):
@@ -173,7 +171,7 @@ class HexGrid:
                 new_tile = Hex(q, r, s)
                 self._tiles[new_tile] = self.tile(new_tile)
     
-        self.highlight_tile(self.player._hex)
+        self.player = {Hex(0, 0, 0): self.tile(Hex(0, 0, 0))}
     
     def tile(self, hex: Hex):
         """ Return a list of
@@ -236,5 +234,15 @@ class HexGrid:
                 tile[1].color = palette['blue'][0]
                 
     def move_player(self, direction: str):
-        self.highlight_again(HexOrientation.neighbor(self.player._hex, direction))
+        # 'move' the player tile in the data structure
+        print(f'player: {self.player}')
+        print(f'direction: {direction}')
+        print(f'neighbor: {HexOrientation.neighbor(self.player.key(), direction)}')
+
+        new_location = HexOrientation.neighbor(self.player, direction)
+        print(f'new_location: {new_location}')
+        print()
+        print()
+        
+        # self.highlight_again(HexOrientation.neighbor(self.player._hex, direction))
         
