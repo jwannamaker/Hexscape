@@ -27,7 +27,7 @@ class Font:
                 
                 self.text.append(letter_sprite)
                 self.border_boxes.append(pyglet.shapes.Box(x, y, self.size_x, self.size_y, 
-                                                           3, batch=self.batch))
+                                                           2, batch=self.batch))
             if x + self.size_x <= self.max_x:
                 x += self.size_x
             else:

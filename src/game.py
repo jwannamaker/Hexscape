@@ -41,6 +41,9 @@ def on_key_press(symbol, modifiers):
     if key.ENTER:
         pass
     
+    if key.SPACE:
+        timer.start()
+    
     if key.W:
         grid.move_player('UP')
         print('UP')
