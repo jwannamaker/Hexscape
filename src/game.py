@@ -33,63 +33,34 @@ grid = HexGrid(32, 6, main_window.width//2, main_window.height//2, background_ba
 clock = pyglet.clock.get_default()
 clock.schedule_interval(timer.update, 1/60.0)
 
+highlight_color = 'purple'
+
 @main_window.event
 def on_key_press(symbol, modifiers):
-    if key.P:
+    if symbol == key.P:
         screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
         pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
     if key.ENTER:
         pass
     
-    if key.SPACE:
-        timer.start()
-    
-    if key.W:
+    if symbol == key.W:
+        grid.move_player('DOWN')
+    if symbol == key.Q:
+        grid.move_player('DOWN_RIGHT')
+    if symbol == key.A:
+        grid.move_player('UP_LEFT')
+    if symbol == key.S:
         grid.move_player('UP')
-        print('UP')
-    if key.W & key.A:
-        
-        print('UP_LEFT')
-    if key.A:
-        # grid.move_player('LEFT')
-        print('LEFT')
-    if key.A & key.S:
-        # grid.move_player('DOWN_LEFT')
-        print('DOWN_LEFT')
-    if key.S:
-        # grid.move_player('DOWN')
-        print('DOWN')
-    if key.S & key.D:
-        # grid.move_player('DOWN_RIGHT')
-        print('DOWN_RIGHT')
-    if key.D:
-        # grid.move_player('RIGHT')
-        print('RIGHT')
-    if key.W & key.D:
-        # grid.move_player('UP_RIGHT')
-        print('UP_RIGHT')
+    if symbol == key.D:
+        grid.move_player('UP_RIGHT')
+    if symbol == key.E:
+        grid.move_player('DOWN_LEFT')
     
-
-@main_window.event
-def on_mouse_press(x, y, button, modifiers):
-    if button == mouse.RIGHT:
-        # circle_manager.draw_circle(x, y, main_batch)
-        grid.highlight_again(x, y)
-        
-        for box in font_manager.border_boxes:
-            if (x, y) in box:
-                box.color = palette['red'][0]
-                
-
-@main_window.event
-def on_mouse_motion(x, y, dx, dy):
-    grid.highlight(x, y)
-
 @main_window.event
 def on_draw():
     main_window.clear()
-    background_batch.draw()
     main_batch.draw()
+    background_batch.draw()
     
     
 if __name__ == '__main__':

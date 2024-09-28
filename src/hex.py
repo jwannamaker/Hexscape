@@ -161,7 +161,6 @@ class HexGrid:
         self._origin = np.row_stack([origin_x, origin_y])
         self._batch = batch
         
-        
         self._tiles = {}
         for q in range(-self._grid_size, self._grid_size + 1, 1):
             start_r = max(-self._grid_size, -q - self._grid_size)
@@ -171,10 +170,11 @@ class HexGrid:
                 new_tile = Hex(q, r, s)
                 self._tiles[new_tile] = self.tile(new_tile)
     
-        self.player = {Hex(0, 0, 0): self.tile(Hex(0, 0, 0))}
+        self.player_pos = Hex(0, 0, 0)
+        self.highlight_tile(self.player_pos)
     
     def tile(self, hex: Hex):
-        """ Return a list of
+        """ Return a list with elements
             [
                 background:pyglet.shapes.Polygon, 
                 foreground:pyglet.shapes.Polygon
@@ -208,41 +208,40 @@ class HexGrid:
     def __contains__(self, key: Hex):
         return key in self._tiles
     
+    def boundary_check(self, tile: Hex, direction: str):
+        """ Returns Hex coordinate of the nearest edge tile if out of bounds. 
+        """
+        if tile in self._tiles:
+            return tile
+        
+        
+    
     def highlight_tile(self, hex: Hex):
         """ Highlight the tile using the hex coordinate. """
         self._tiles[hex][0].color = palette['red'][0]
         self._tiles[hex][1].color = palette['red'][1]
     
-    def highlight(self, screen_x: int, screen_y: int):
+    def highlight(self, screen_x: int, screen_y: int, color: str):
         """ Highlight the tile that contains the given screen-space coordinate.
         """
         for tile in self._tiles.values():
             if (screen_x, screen_y) in tile[0]:
-                tile[0].color = palette['purple'][3]
-                tile[1].color = palette['purple'][2]
-            else:
-                tile[0].color = palette['blue'][1]
-                tile[1].color = palette['blue'][0]
-                
-    def highlight_again(self, screen_x: int, screen_y: int):
-        for tile in self._tiles.values():
-            if (screen_x, screen_y) in tile:
-                tile[0].color = palette['blue'][2]
-                tile[1].color = palette['blue'][3]
+                tile[0].color = palette[color][3]
+                tile[1].color = palette[color][2]
             else:
                 tile[0].color = palette['blue'][1]
                 tile[1].color = palette['blue'][0]
                 
     def move_player(self, direction: str):
-        # 'move' the player tile in the data structure
-        print(f'player: {self.player}')
+        # 'move' the player tile == change the player position on the board
+        print(f'\nplayer_pos: {self.player_pos}')
         print(f'direction: {direction}')
-        print(f'neighbor: {HexOrientation.neighbor(self.player.key(), direction)}')
 
-        new_location = HexOrientation.neighbor(self.player, direction)
+        new_location = HexOrientation.neighbor(self.player_pos, direction)
         print(f'new_location: {new_location}')
-        print()
-        print()
+        print('-'*50)
+        self.player_pos = new_location
         
-        # self.highlight_again(HexOrientation.neighbor(self.player._hex, direction))
+        self.highlight_tile(self.player_pos)
+        
         
