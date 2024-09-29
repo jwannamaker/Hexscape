@@ -91,12 +91,12 @@ class HexOrientation:
         return HexOrientation.round(((screen_pos - origin) / radius) @ HexOrientation.pixel_to_hex)
     
     ADJACENT_DIRECTION = {
-        'UP_RIGHT':   Hex(+1, -1,  0), 
-        'UP':         Hex( 0, -1, +1), 
-        'UP_LEFT':    Hex(-1,  0, +1),
-        'DOWN_RIGHT': Hex(-1, +1,  0), 
-        'DOWN':       Hex( 0, +1, -1), 
-        'DOWN_LEFT':  Hex(+1,  0, -1)
+        'UP_RIGHT':   Hex(+1, -1,  0), # E
+        'UP':         Hex( 0, -1, +1), # W
+        'UP_LEFT':    Hex(-1,  0, +1), # Q
+        'DOWN_RIGHT': Hex(-1, +1,  0), # D
+        'DOWN':       Hex( 0, +1, -1), # S
+        'DOWN_LEFT':  Hex(+1,  0, -1)  # A
     }
     
     DIAGONAL_DIRECTION = {
@@ -213,7 +213,7 @@ class HexGrid:
         """
         if tile in self._tiles:
             return tile
-        
+        # if tile.distance_to() 
         
     
     def highlight_tile(self, hex: Hex):

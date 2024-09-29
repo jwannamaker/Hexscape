@@ -28,12 +28,20 @@ button_manager = Button(main_window)
 timer = Timer(main_window.width, main_window.height, background_batch)
 
 font_manager.write('Level 1', 0, main_window.height-64)
-grid = HexGrid(32, 6, main_window.width//2, main_window.height//2, background_batch)
+grid = HexGrid(radius=32, 
+               grid_size=6, 
+               origin_x=main_window.width//2, 
+               origin_y=main_window.height//2, 
+               batch=background_batch)
 
 clock = pyglet.clock.get_default()
 clock.schedule_interval(timer.update, 1/60.0)
 
 highlight_color = 'purple'
+player = pyglet.sprite.Sprite(img=hex_image, 
+                              x=main_window.width//2, 
+                              y=main_window.height//2,
+                              batch=main_batch)
 
 @main_window.event
 def on_key_press(symbol, modifiers):
@@ -43,6 +51,7 @@ def on_key_press(symbol, modifiers):
     if key.ENTER:
         pass
     
+    """ Note: Axes are flipped and not in the intuitive orientation already. """
     if symbol == key.W:
         grid.move_player('DOWN')
     if symbol == key.Q:
@@ -59,9 +68,8 @@ def on_key_press(symbol, modifiers):
 @main_window.event
 def on_draw():
     main_window.clear()
-    main_batch.draw()
     background_batch.draw()
-    
+    main_batch.draw()
     
 if __name__ == '__main__':
     pyglet.app.run()
