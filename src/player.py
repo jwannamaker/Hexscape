@@ -30,17 +30,22 @@ the appropriate info for
 
 """
     
-class Player:
-    def __init__(self, grid: HexGrid, batch: pyglet.graphics.Batch):
+class Player(pyglet.sprite.Sprite):
+    def __init__(self, img: pyglet.image.Texture, x: int, y: int, batch: pyglet.graphics.Batch,
+                 grid: HexGrid):
+        super().__init__(img, x, y, batch=batch)
         self.health = 12
         self.attack = 6
         self.defense = 4
         
-        self.position = grid.get_player_position()
+        self.hex_position = grid.player_pos
+        self.velocity_x = 0
+        self.velocity_y = 0
         
-        
-        
-    def move(self, direction):
+    def set_direction(self, direction):
         pass
     
+    def update(self, dt):
+        self.x += self.velocity_x * dt
+        self.y += self.velocity_y * dt
     

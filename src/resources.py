@@ -27,6 +27,13 @@ keys = [*string.ascii_uppercase, *string.digits]
 values = [pyglet.resource.image(f'{char}.png') for char in keys]
 font = {k: v for k, v in zip(keys, values)}
 
+def center_anchor(img: pyglet.image.TextureRegion):
+    img.anchor_x = img.width // 2
+    img.anchor_y = img.height // 2
+
 hex_image = pyglet.resource.image('dusk-hexagon-64x64.png')
-hex_image.anchor_x = hex_image.width // 2
-hex_image.anchor_y = hex_image.height // 2
+center_anchor(hex_image)
+
+ball_image = pyglet.resource.image('simple-ball-32x32.png')
+center_anchor(ball_image)
+

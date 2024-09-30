@@ -10,8 +10,9 @@ from circle import Circle
 from font import Font
 from button import Button
 from hex import HexGrid
+from player import Player
 from timer import Timer
-from resources import palette, hex_image
+from resources import palette, hex_image, ball_image
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -28,42 +29,41 @@ button_manager = Button(main_window)
 timer = Timer(main_window.width, main_window.height, background_batch)
 
 font_manager.write('Level 1', 0, main_window.height-64)
-grid = HexGrid(radius=32, 
-               grid_size=6, 
-               origin_x=main_window.width//2, 
-               origin_y=main_window.height//2, 
-               batch=background_batch)
+board = HexGrid(radius=32, 
+                grid_size=6, 
+                origin_x=main_window.width//2, 
+                origin_y=main_window.height//2, 
+                batch=background_batch)
 
 clock = pyglet.clock.get_default()
 clock.schedule_interval(timer.update, 1/60.0)
 
 highlight_color = 'purple'
-player = pyglet.sprite.Sprite(img=hex_image, 
-                              x=main_window.width//2, 
-                              y=main_window.height//2,
-                              batch=main_batch)
+player = Player(img=ball_image, 
+                x=main_window.width//2, 
+                y=main_window.height//2,
+                batch=main_batch,
+                grid=board)
 
 @main_window.event
 def on_key_press(symbol, modifiers):
     if symbol == key.P:
         screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
         pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
-    if key.ENTER:
-        pass
     
-    """ Note: Axes are flipped and not in the intuitive orientation already. """
-    if symbol == key.W:
-        grid.move_player('DOWN')
+    """ Note: Axes are flipped and not in the intuitive orientation. """
     if symbol == key.Q:
-        grid.move_player('DOWN_RIGHT')
-    if symbol == key.A:
-        grid.move_player('UP_LEFT')
-    if symbol == key.S:
-        grid.move_player('UP')
-    if symbol == key.D:
-        grid.move_player('UP_RIGHT')
+        board.move_player('DOWN_RIGHT')
+    if symbol == key.W:
+        board.move_player('DOWN')
     if symbol == key.E:
-        grid.move_player('DOWN_LEFT')
+        board.move_player('DOWN_LEFT')
+    if symbol == key.A:
+        board.move_player('UP_LEFT')
+    if symbol == key.S:
+        board.move_player('UP')
+    if symbol == key.D:
+        board.move_player('UP_RIGHT')
     
 @main_window.event
 def on_draw():

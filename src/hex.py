@@ -155,7 +155,8 @@ class HexGrid:
     origin_y:   screen coordinate in pixels for 
     batch:      batch of the board that it gets
     """
-    def __init__(self, radius: int, grid_size: int, origin_x: int, origin_y: int, batch: pyglet.graphics.Batch):
+    def __init__(self, radius: int, grid_size: int, origin_x: int, origin_y: int, 
+                 batch: pyglet.graphics.Batch):
         self._radius = radius
         self._grid_size = grid_size
         self._origin = np.row_stack([origin_x, origin_y])
@@ -208,12 +209,13 @@ class HexGrid:
     def __contains__(self, key: Hex):
         return key in self._tiles
     
-    def boundary_check(self, tile: Hex, direction: str):
+    def boundary_check(self, pre_move: Hex, direction: str):
         """ Returns Hex coordinate of the nearest edge tile if out of bounds. 
         """
-        if tile in self._tiles:
-            return tile
-        # if tile.distance_to() 
+        post_move = pre_move + HexOrientation.ADJACENT_DIRECTION[direction]
+        if post_move.distance_to(Hex(0, 0, 0)) <= self._radius:
+            return post_move
+        return pre_move
         
     
     def highlight_tile(self, hex: Hex):
