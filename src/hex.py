@@ -7,6 +7,7 @@ import pyglet
 import numpy as np
 
 from resources import palette
+from player import Player
 
 def x_rotation(point, angle):
     theta = np.deg2rad(angle)
@@ -156,7 +157,7 @@ class HexGrid:
     batch:      batch of the board that it gets
     """
     def __init__(self, radius: int, grid_size: int, origin_x: int, origin_y: int, 
-                 batch: pyglet.graphics.Batch):
+                 batch: pyglet.graphics.Batch, player: Player):
         self._radius = radius
         self._grid_size = grid_size
         self._origin = np.row_stack([origin_x, origin_y])
@@ -172,6 +173,7 @@ class HexGrid:
                 self._tiles[new_tile] = self.tile(new_tile)
     
         self.player_pos = Hex(0, 0, 0)
+        self.player = player
         self.highlight_tile(self.player_pos)
     
     def tile(self, hex: Hex):
@@ -233,8 +235,10 @@ class HexGrid:
                 tile[1].color = palette['blue'][0]
                 
     def move_player(self, direction: str):
-        new_location = self.boundary_check(self.player_pos, direction)
-        self.player_pos = new_location
+        new_tile = self.boundary_check(self.player_pos, direction)
+        self.player_pos = new_tile
         self.highlight_tile(self.player_pos)
         
+        next_position = HexOrientation.center(new_tile, self._radius, self._origin)
+        self.player.set_next_position((round(next_position[0][0]), round(next_position[1][0])))
         

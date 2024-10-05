@@ -1,8 +1,5 @@
 import pyglet
-
-from hex import HexOrientation, Hex, HexGrid
-from resources import palette
-
+import numpy as np
 
 """
 # STATUS STATS
@@ -31,19 +28,30 @@ the appropriate info for
 """
     
 class Player(pyglet.sprite.Sprite):
-    def __init__(self, img: pyglet.image.Texture, x: int, y: int, batch: pyglet.graphics.Batch):
+    def __init__(self, img: pyglet.image.Texture, x: int, y: int, 
+                 batch: pyglet.graphics.Batch):
         super().__init__(img, x, y, batch=batch)
         self.health = 12
         self.attack = 6
         self.defense = 4
         
-        self.next_position = self.x, self.y
+        self.current_position = pyglet.math.Vec2(self.x, self.y)
+        self.next_position = pyglet.math.Vec2(self.x, self.y)
         self.velocity_x = 0
         self.velocity_y = 0
     
-    def update(self, dt):
-        self.x += self.velocity_x * dt
-        self.y += self.velocity_y * dt
-        
+    def move(self, dt):
+        if self.current_position is not self.next_position:
+            self.x += self.velocity_x * dt * 10
+            self.y += self.velocity_y * dt * 10
+        else:
+            pyglet.clock.unschedule(self.move)
+    
     def set_next_position(self, screen_position):
-        self.next_position = screen_position
+        self.next_position = pyglet.math.Vec2(*screen_position)
+        
+        velocity = self.current_position.lerp(self.next_position, 1).normalize()
+        self.velocity_x = velocity[0]
+        self.velocity_y = velocity[1]
+        
+    
