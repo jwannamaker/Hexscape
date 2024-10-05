@@ -54,7 +54,7 @@ class Hex:
         return (abs(self.q) + abs(self.r) + abs(self.s)) // 2
     
     def distance_to(self, other: 'Hex'):
-        return self.length(self - other)
+        return (self - other).length()
     
     def vector(self):
         return np.row_stack([self.q, self.r])
@@ -210,10 +210,8 @@ class HexGrid:
         return key in self._tiles
     
     def boundary_check(self, pre_move: Hex, direction: str):
-        """ Returns Hex coordinate of the nearest edge tile if out of bounds. 
-        """
         post_move = pre_move + HexOrientation.ADJACENT_DIRECTION[direction]
-        if post_move.distance_to(Hex(0, 0, 0)) <= self._radius:
+        if post_move.distance_to(Hex(0, 0, 0)) <= self._grid_size:
             return post_move
         return pre_move
         
@@ -235,15 +233,8 @@ class HexGrid:
                 tile[1].color = palette['blue'][0]
                 
     def move_player(self, direction: str):
-        # 'move' the player tile == change the player position on the board
-        print(f'\nplayer_pos: {self.player_pos}')
-        print(f'direction: {direction}')
-
-        new_location = HexOrientation.neighbor(self.player_pos, direction)
-        print(f'new_location: {new_location}')
-        print('-'*50)
+        new_location = self.boundary_check(self.player_pos, direction)
         self.player_pos = new_location
-        
         self.highlight_tile(self.player_pos)
         
         

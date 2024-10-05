@@ -42,8 +42,7 @@ highlight_color = 'purple'
 player = Player(img=ball_image, 
                 x=main_window.width//2, 
                 y=main_window.height//2,
-                batch=main_batch,
-                grid=board)
+                batch=main_batch)
 
 @main_window.event
 def on_key_press(symbol, modifiers):

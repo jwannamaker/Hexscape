@@ -31,21 +31,19 @@ the appropriate info for
 """
     
 class Player(pyglet.sprite.Sprite):
-    def __init__(self, img: pyglet.image.Texture, x: int, y: int, batch: pyglet.graphics.Batch,
-                 grid: HexGrid):
+    def __init__(self, img: pyglet.image.Texture, x: int, y: int, batch: pyglet.graphics.Batch):
         super().__init__(img, x, y, batch=batch)
         self.health = 12
         self.attack = 6
         self.defense = 4
         
-        self.hex_position = grid.player_pos
+        self.next_position = self.x, self.y
         self.velocity_x = 0
         self.velocity_y = 0
-        
-    def set_direction(self, direction):
-        pass
     
     def update(self, dt):
         self.x += self.velocity_x * dt
         self.y += self.velocity_y * dt
-    
+        
+    def set_next_position(self, screen_position):
+        self.next_position = screen_position
