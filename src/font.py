@@ -1,18 +1,9 @@
-import string
-
 import pyglet
+
+import resources
 
 
 class Font:
-    char_list = [
-        '5', '6', '7', '8', '9', '0',
-        'Y', 'Z', '1', '2', '3', '4',
-        'S', 'T', 'U', 'V', 'W', 'X',
-        'M', 'N', 'O', 'P', 'Q', 'R',
-        'G', 'H', 'I', 'J', 'K', 'L',
-        'A', 'B', 'C', 'D', 'E', 'F'
-    ]
-    
     def __init__(self, size_x, size_y, window_width, window_height, batch):
         self.text = []
         self.size_x = size_x
@@ -26,16 +17,17 @@ class Font:
         self.batch = batch
     
     def write(self, text, start_x, start_y):
-        x, y = start_x, start_y
+        x, y = max(self.min_x, start_x), max(self.min_y, start_y)
         for char in text:
             if char != ' ':
-                letter_img = pyglet.resource.image(f'{char.upper()}.png')
+                letter_img = resources.font[char.upper()]
                 letter_sprite = pyglet.sprite.Sprite(img=letter_img, x=x, y=y, batch=self.batch)
                 letter_sprite.scale_x = self.size_x / letter_sprite.width
+                letter_sprite.scale_y = self.size_y / letter_sprite.height
                 
                 self.text.append(letter_sprite)
                 self.border_boxes.append(pyglet.shapes.Box(x, y, self.size_x, self.size_y, 
-                                                           5, batch=self.batch))
+                                                           2, batch=self.batch))
             if x + self.size_x <= self.max_x:
                 x += self.size_x
             else:

@@ -5,7 +5,9 @@ import random
 
 import pyglet
 import numpy as np
-from numpy.linalg import inv
+
+from resources import palette, bop_laser_sound
+from player import Player
 
 def x_rotation(point, angle):
     theta = np.deg2rad(angle)
@@ -53,7 +55,7 @@ class Hex:
         return (abs(self.q) + abs(self.r) + abs(self.s)) // 2
     
     def distance_to(self, other: 'Hex'):
-        return self.length(self - other)
+        return (self - other).length()
     
     def vector(self):
         return np.row_stack([self.q, self.r])
@@ -90,12 +92,12 @@ class HexOrientation:
         return HexOrientation.round(((screen_pos - origin) / radius) @ HexOrientation.pixel_to_hex)
     
     ADJACENT_DIRECTION = {
-        'UP_RIGHT':   Hex(+1, -1,  0), 
-        'UP':         Hex( 0, -1, +1), 
-        'UP_LEFT':    Hex(-1,  0, +1),
-        'DOWN_RIGHT': Hex(-1, +1,  0), 
-        'DOWN':       Hex( 0, +1, -1), 
-        'DOWN_LEFT':  Hex(+1,  0, -1)
+        'UP_RIGHT':   Hex(+1, -1,  0), # E
+        'UP':         Hex( 0, -1, +1), # W
+        'UP_LEFT':    Hex(-1,  0, +1), # Q
+        'DOWN_RIGHT': Hex(-1, +1,  0), # D
+        'DOWN':       Hex( 0, +1, -1), # S
+        'DOWN_LEFT':  Hex(+1,  0, -1)  # A
     }
     
     DIAGONAL_DIRECTION = {
@@ -111,9 +113,9 @@ class HexOrientation:
     def neighbor(hex: Hex, direction: str):
         """ Return the hex coordinate for the neighbor of hex in direction """
         if direction in HexOrientation.ADJACENT_DIRECTION:
-            return hex + HexOrientation.ADJACENT_DIRECTION(direction)
+            return hex + HexOrientation.ADJACENT_DIRECTION[direction]
         if direction in HexOrientation.DIAGONAL_DIRECTION:
-            return hex + HexOrientation.DIAGONAL_DIRECTION(direction)
+            return hex + HexOrientation.DIAGONAL_DIRECTION[direction]
         return hex # No neighbor was found, so return the original coordinate
     
     @staticmethod
@@ -134,8 +136,28 @@ class HexOrientation:
             s = -q - r
         return Hex(q, r, s)
 
+
+# class Player:
+#     def __init__(self, initial_position: Hex):
+#         self._hex = initial_position
+#         self._color = palette['red'][0]
+        
+#     def place(self, new_position):
+#         self._hex = new_position
+        
+#     def move(self, direction: str):
+#         self._hex = HexOrientation.neighbor(self._hex, direction)
+
 class HexGrid:
-    def __init__(self, radius: int, grid_size: int, origin_x: int, origin_y: int, batch: pyglet.graphics.Batch):
+    """ 
+    radius:     pixels measurement of radius for a hex tile
+    grid_size:  int for creating a 'square' hex grid (each side length matches this int)
+    origin_x:   screen coordinate in pixels for 
+    origin_y:   screen coordinate in pixels for 
+    batch:      batch of the board that it gets
+    """
+    def __init__(self, radius: int, grid_size: int, origin_x: int, origin_y: int, 
+                 batch: pyglet.graphics.Batch, player: Player):
         self._radius = radius
         self._grid_size = grid_size
         self._origin = np.row_stack([origin_x, origin_y])
@@ -150,14 +172,23 @@ class HexGrid:
                 new_tile = Hex(q, r, s)
                 self._tiles[new_tile] = self.tile(new_tile)
     
+        self.player_pos = Hex(0, 0, 0)
+        self.player = player
+        self.highlight_tile(self.player_pos)
+    
     def tile(self, hex: Hex):
-        """ Eventually return a sprite of the tile. """
-        center_x, center_y = HexOrientation.center(hex, 64, self._origin)
+        """ Return a list with elements
+            [
+                background:pyglet.shapes.Polygon, 
+                foreground:pyglet.shapes.Polygon
+            ]
+        corresponding to the tile at hex. """
+        center_x, center_y = HexOrientation.center(hex, self._radius, self._origin)
         background = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius, center_x, center_y),
-                                           color=(255, 100, 67, 255),
+                                           color=palette['blue'][1],
                                            batch=self._batch)
-        foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 10, center_x, center_y),
-                                           color=(0, 0, 0, 255),
+        foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 4, center_x, center_y),
+                                           color=palette['blue'][0],
                                            batch=self._batch)
         return [background, foreground]
         
@@ -180,16 +211,34 @@ class HexGrid:
     def __contains__(self, key: Hex):
         return key in self._tiles
     
-    def highlight(self, screen_x, screen_y):
-        # screen_pos = np.row_stack([screen_x, screen_y])
+    def boundary_check(self, pre_move: Hex, direction: str):
+        post_move = pre_move + HexOrientation.ADJACENT_DIRECTION[direction]
+        if post_move.distance_to(Hex(0, 0, 0)) <= self._grid_size:
+            return post_move
+        bop_laser_sound.play()
+        return pre_move
+        
+    
+    def highlight_tile(self, hex: Hex):
+        """ Highlight the tile using the hex coordinate. """
+        self._tiles[hex][0].color = palette['red'][0]
+        self._tiles[hex][1].color = palette['red'][1]
+    
+    def highlight(self, screen_x: int, screen_y: int, color: str):
+        """ Highlight the tile that contains the given screen-space coordinate.
+        """
         for tile in self._tiles.values():
             if (screen_x, screen_y) in tile[0]:
-                tile[0].color = (255, 255, 255, 255)
-                tile[1].color = (random.randint(100, 200), 
-                                 random.randint(50, 255),
-                                 random.randint(0, 100), 
-                                 255)
-
-# if __name__ == '__main__':
-    # test_grid = HexGrid()
-    
+                tile[0].color = palette[color][3]
+                tile[1].color = palette[color][2]
+            else:
+                tile[0].color = palette['blue'][1]
+                tile[1].color = palette['blue'][0]
+                
+    def move_player(self, direction: str):
+        new_tile = self.boundary_check(self.player_pos, direction)
+        self.player_pos = new_tile
+        self.highlight_tile(self.player_pos)
+        
+        next_position = HexOrientation.center(new_tile, self._radius, self._origin)
+        self.player.set_next_position((round(next_position[0][0]), round(next_position[1][0])))
