@@ -6,7 +6,7 @@ import random
 import pyglet
 import numpy as np
 
-from resources import palette
+from resources import palette, bop_laser_sound
 from player import Player
 
 def x_rotation(point, angle):
@@ -215,6 +215,7 @@ class HexGrid:
         post_move = pre_move + HexOrientation.ADJACENT_DIRECTION[direction]
         if post_move.distance_to(Hex(0, 0, 0)) <= self._grid_size:
             return post_move
+        bop_laser_sound.play()
         return pre_move
         
     

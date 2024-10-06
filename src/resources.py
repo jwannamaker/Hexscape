@@ -13,8 +13,8 @@ pyglet.resource.reindex()
 
 """ 
 A dict for the palette with 
-    k: string name of colors
-    v: RGB int tuple
+    k: string name of color
+    v: list of RGB int tuples
 """
 palette: dict[str, int] = json.load(pyglet.resource.file('palette.json'))
 for key in palette:
@@ -37,3 +37,5 @@ center_anchor(hex_image)
 ball_image = pyglet.resource.image('simple-ball-32x32.png')
 center_anchor(ball_image)
 
+bop_laser_sound = pyglet.resource.media('bop_laser.wav')
+click_sound = pyglet.resource.media('click.wav')

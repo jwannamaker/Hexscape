@@ -1,6 +1,8 @@
 import pyglet
 import numpy as np
 
+from resources import bop_laser_sound, click_sound
+
 """
 # STATUS STATS
 - health points + any boosters
@@ -42,7 +44,7 @@ class Player(pyglet.sprite.Sprite):
     
     def move(self, dt):
         self.current_position = pyglet.math.Vec2(self.x, self.y)
-        if self.current_position.distance(self.next_position) > 0.01:
+        if self.current_position.distance(self.next_position) > 0.1:
             self.x += self.velocity_x * dt
             self.y += self.velocity_y * dt
         else:
@@ -50,6 +52,7 @@ class Player(pyglet.sprite.Sprite):
         
     
     def set_next_position(self, screen_position):
+        click_sound.play()
         self.next_position = pyglet.math.Vec2(*screen_position)
         
         velocity = self.next_position - self.current_position
