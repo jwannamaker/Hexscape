@@ -41,16 +41,18 @@ class Player(pyglet.sprite.Sprite):
         self.velocity_y = 0
     
     def move(self, dt):
-        if self.current_position is not self.next_position:
-            self.x += self.velocity_x * dt * 10
-            self.y += self.velocity_y * dt * 10
+        self.current_position = pyglet.math.Vec2(self.x, self.y)
+        if self.current_position.distance(self.next_position) > 0.01:
+            self.x += self.velocity_x * dt
+            self.y += self.velocity_y * dt
         else:
             pyglet.clock.unschedule(self.move)
+        
     
     def set_next_position(self, screen_position):
         self.next_position = pyglet.math.Vec2(*screen_position)
         
-        velocity = self.current_position.lerp(self.next_position, 1).normalize()
+        velocity = self.next_position - self.current_position
         self.velocity_x = velocity[0]
         self.velocity_y = velocity[1]
         
