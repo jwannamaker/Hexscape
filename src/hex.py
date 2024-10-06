@@ -207,7 +207,7 @@ class HexGrid:
                 s = -q - r
                 results.append(hex + Hex(q, r, s))
         return results
-    
+
     def __contains__(self, key: Hex):
         return key in self._tiles
     
@@ -242,4 +242,3 @@ class HexGrid:
         
         next_position = HexOrientation.center(new_tile, self._radius, self._origin)
         self.player.set_next_position((round(next_position[0][0]), round(next_position[1][0])))
-        
