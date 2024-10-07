@@ -6,7 +6,7 @@ import random
 import pyglet
 import numpy as np
 
-from resources import palette, bop_laser_sound
+from resources import palette, bop_laser_sound, click_sound
 from player import Player
 
 def x_rotation(point, angle):
@@ -236,6 +236,7 @@ class HexGrid:
                 tile[1].color = palette['blue'][0]
                 
     def move_player(self, direction: str):
+        click_sound.play()
         new_tile = self.boundary_check(self.player_pos, direction)
         self.player_pos = new_tile
         self.highlight_tile(self.player_pos)
