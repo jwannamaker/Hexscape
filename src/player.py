@@ -1,3 +1,5 @@
+from collections import deque
+
 import pyglet
 import numpy as np
 
@@ -32,24 +34,29 @@ class Player(pyglet.sprite.Sprite):
                  batch: pyglet.graphics.Batch):
         super().__init__(img, x, y, batch=batch)
         self.current_position = pyglet.math.Vec2(self.x, self.y)
-        self.next_position = pyglet.math.Vec2(self.x, self.y)
-        self.velocity_x = 0
-        self.velocity_y = 0
+        self.next_position = deque([])
+        self._movable = True
+    
+    def movable(self):
+        return self._movable
     
     def move(self, dt):
         self.current_position = pyglet.math.Vec2(self.x, self.y)
-        if self.current_position.distance(self.next_position) > 0.1:
-            self.x += self.velocity_x * dt
-            self.y += self.velocity_y * dt
+        destination = self.current_position if len(self.next_position) == 0 else self.next_position[0]
+        distance = self.current_position.distance(destination)
+        if distance > 0.01:
+            self._movable = False
+            self.x += ((destination[0] - self.x) / distance) * dt * 100
+            self.y += ((destination[1] - self.y) / distance) * dt * 100
         else:
+            self._movable = True
+            if len(self.next_position) > 0:
+                self.next_position.popleft()
             pyglet.clock.unschedule(self.move)
         
-    def set_next_position(self, screen_position):
-        self.next_position = pyglet.math.Vec2(*screen_position)
-        
-        velocity = self.next_position - self.current_position
-        velocity.normalize()
-        self.velocity_x = velocity[0]
-        self.velocity_y = velocity[1]
+    def add_next_position(self, screen_position):
+        position = pyglet.math.Vec2(*screen_position)
+        if position not in self.next_position:
+            self.next_position.append(pyglet.math.Vec2(*screen_position))
         
     

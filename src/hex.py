@@ -1,7 +1,5 @@
-from dataclasses import dataclass, field
-from collections import namedtuple
-import operator
-import random
+from dataclasses import dataclass
+from collections import deque
 
 import pyglet
 import numpy as np
@@ -150,11 +148,14 @@ class HexOrientation:
 
 class HexGrid:
     """ 
-    radius:     pixels measurement of radius for a hex tile
-    grid_size:  int for creating a 'square' hex grid (each side length matches this int)
-    origin_x:   screen coordinate in pixels for 
-    origin_y:   screen coordinate in pixels for 
-    batch:      batch of the board that it gets
+    radius:     pixel measurement of radius for a hex tile
+    grid_size:  int for creating a 'square' hex grid (each side length matches 
+                this int)
+    origin_x:   x coordinate in pixels for center of origin tile
+    origin_y:   y coordinate in pixels for center of origin tile
+    batch:      batch that the board is rendered with
+    player:     player that gets placed on the board
+    clock:      clock from the running app
     """
     def __init__(self, radius: int, grid_size: int, origin_x: int, origin_y: int, 
                  batch: pyglet.graphics.Batch, player: Player):
@@ -177,7 +178,7 @@ class HexGrid:
         self.highlight_tile(self.player_pos)
     
     def tile(self, hex: Hex):
-        """ Return a list with elements
+        """ Return a list with entries
             [
                 background:pyglet.shapes.Polygon, 
                 foreground:pyglet.shapes.Polygon
@@ -218,11 +219,9 @@ class HexGrid:
         bop_laser_sound.play()
         return pre_move
         
-    
     def highlight_tile(self, hex: Hex):
         """ Highlight the tile using the hex coordinate. """
         self._tiles[hex][0].color = palette['red'][0]
-        self._tiles[hex][1].color = palette['red'][1]
     
     def highlight(self, screen_x: int, screen_y: int, color: str):
         """ Highlight the tile that contains the given screen-space coordinate.
@@ -242,4 +241,4 @@ class HexGrid:
         self.highlight_tile(self.player_pos)
         
         next_position = HexOrientation.center(new_tile, self._radius, self._origin)
-        self.player.set_next_position((round(next_position[0][0]), round(next_position[1][0])))
+        self.player.add_next_position((round(next_position[0][0]), round(next_position[1][0])))

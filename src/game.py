@@ -47,6 +47,9 @@ board = HexGrid(radius=32,
                 batch=background_batch,
                 player=player)
 
+player_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
+
+
 @main_window.event
 def on_key_press(symbol, modifiers):
     if audio_player.playing == False:
@@ -56,25 +59,22 @@ def on_key_press(symbol, modifiers):
         screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
         pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
     
-    """ Note: Axes are flipped and not in the intuitive orientation. """
-    if symbol == key.Q:
-        board.move_player('DOWN_RIGHT')
-        clock.schedule(player.move)
-    if symbol == key.W:
-        board.move_player('DOWN')
-        clock.schedule(player.move)
-    if symbol == key.E:
-        board.move_player('DOWN_LEFT')
-        clock.schedule(player.move)
-    if symbol == key.A:
-        board.move_player('UP_LEFT')
-        clock.schedule(player.move)
-    if symbol == key.S:
-        board.move_player('UP')
-        clock.schedule(player.move)
-    if symbol == key.D:
-        board.move_player('UP_RIGHT')
-        clock.schedule(player.move)
+    if symbol in player_controls:
+        if player.movable():
+            """ Note: Axes are flipped and not in the intuitive orientation. """
+            if symbol == key.Q:
+                board.move_player('DOWN_RIGHT')
+            if symbol == key.W:
+                board.move_player('DOWN')
+            if symbol == key.E:
+                board.move_player('DOWN_LEFT')
+            if symbol == key.A:
+                board.move_player('UP_LEFT')
+            if symbol == key.S:
+                board.move_player('UP')
+            if symbol == key.D:
+                board.move_player('UP_RIGHT')
+            clock.schedule(player.move)
     
 @main_window.event
 def on_draw():
