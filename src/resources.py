@@ -2,6 +2,7 @@ import string
 import json
 
 import pyglet
+import numpy as np
 from PIL import ImageColor
 
 pyglet.resource.path = ['../resources', 
@@ -41,3 +42,26 @@ bop_laser_sound = pyglet.resource.media('bop_laser.wav', False)
 click_sound = pyglet.resource.media('click.wav', False)
 intro = pyglet.resource.media('intro.mp3', False)
 full_track = pyglet.resource.media('Piano_bipFullTrack.wav', True)
+
+# Find color fade in/out values
+control_pt_1 = pyglet.math.Vec2(0, 255)
+control_pt_2 = pyglet.math.Vec2(40, 255)
+control_pt_3 = pyglet.math.Vec2(16, 130)
+control_pt_4 = pyglet.math.Vec2(60, 128)
+
+def fade_out():
+    t = 0.0
+    while t < 10.0:
+        midpoint_a = control_pt_1.lerp(control_pt_2, t)
+        midpoint_b = control_pt_2.lerp(control_pt_3, t)
+        midpoint_c = control_pt_3.lerp(control_pt_4, t)
+        
+        midpoint_d = midpoint_a.lerp(midpoint_b, t)
+        midpoint_e = midpoint_b.lerp(midpoint_c, t)
+        
+        point = midpoint_d.lerp(midpoint_e, t)
+        yield point.y
+        
+        t += 1.0
+    
+

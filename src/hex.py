@@ -4,7 +4,7 @@ from collections import deque
 import pyglet
 import numpy as np
 
-from resources import palette, bop_laser_sound, click_sound
+from resources import palette, bop_laser_sound, click_sound, fade_out
 from player import Player
 
 def x_rotation(point, angle):
@@ -134,7 +134,6 @@ class HexOrientation:
             s = -q - r
         return Hex(q, r, s)
 
-
 # class Player:
 #     def __init__(self, initial_position: Hex):
 #         self._hex = initial_position
@@ -175,13 +174,14 @@ class HexGrid:
     
         self.player_pos = Hex(0, 0, 0)
         self.player = player
+        self._player_trail = deque([])
         self.highlight_tile(self.player_pos)
     
     def tile(self, hex: Hex):
-        """ Return a list with entries
+        """ Return a dict with entries
             [
-                background:pyglet.shapes.Polygon, 
-                foreground:pyglet.shapes.Polygon
+                'background': pyglet.shapes.Polygon, 
+                'foreground': pyglet.shapes.Polygon
             ]
         corresponding to the tile at hex. """
         center_x, center_y = HexOrientation.center(hex, self._radius, self._origin)
@@ -191,7 +191,7 @@ class HexGrid:
         foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 4, center_x, center_y),
                                            color=palette['blue'][0],
                                            batch=self._batch)
-        return [background, foreground]
+        return {'background': background, 'foreground': foreground}
         
     def nearby(self, hex: Hex, search_distance: int):
         """ Returns a list of hex coordinates within search_distance to the given 
@@ -219,20 +219,25 @@ class HexGrid:
         bop_laser_sound.play()
         return pre_move
         
+    def fade_tile(self, dt: float):
+        for tile, opacity in zip(self._player_trail, fade_out()):
+            self._tiles[tile]['foreground'].opacity = opacity
+                
+    
     def highlight_tile(self, hex: Hex):
         """ Highlight the tile using the hex coordinate. """
-        self._tiles[hex][0].color = palette['red'][0]
+        self._tiles[hex]['background'].color = palette['red'][0]
     
     def highlight(self, screen_x: int, screen_y: int, color: str):
         """ Highlight the tile that contains the given screen-space coordinate.
         """
         for tile in self._tiles.values():
             if (screen_x, screen_y) in tile[0]:
-                tile[0].color = palette[color][3]
-                tile[1].color = palette[color][2]
+                tile['background'].color = palette[color][3]
+                tile['foreground'].color = palette[color][2]
             else:
-                tile[0].color = palette['blue'][1]
-                tile[1].color = palette['blue'][0]
+                tile['background'].color = palette['blue'][1]
+                tile['foreground'].color = palette['blue'][0]
                 
     def move_player(self, direction: str):
         click_sound.play()
@@ -242,3 +247,4 @@ class HexGrid:
         
         next_position = HexOrientation.center(new_tile, self._radius, self._origin)
         self.player.add_next_position((round(next_position[0][0]), round(next_position[1][0])))
+        self._player_trail.append(new_tile)
