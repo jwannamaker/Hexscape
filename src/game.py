@@ -48,7 +48,7 @@ board = HexGrid(radius=32,
                 player=player)
 
 clock = pyglet.clock.get_default()
-clock.schedule_interval_soft(board.fade_tile, 0.01)
+clock.schedule_interval_soft(board.fade_tile, 0.005)
 
 
 @main_window.event

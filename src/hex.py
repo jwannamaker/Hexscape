@@ -174,7 +174,8 @@ class HexGrid:
     
         self.player_pos = Hex(0, 0, 0)
         self.player = player
-        self._player_trail = deque([])
+        self._player_trail = dict()
+        self._player_trail[self.player_pos] = 0
         self.highlight_tile(self.player_pos)
     
     def tile(self, hex: Hex):
@@ -220,8 +221,9 @@ class HexGrid:
         return pre_move
         
     def fade_tile(self, dt: float):
-        for tile, opacity in zip(self._player_trail, fade_out()):
-            self._tiles[tile]['foreground'].opacity = opacity
+        for tile, time in list(self._player_trail.items()):
+            self._player_trail[tile] += 1 if time < len(fade_out) - 1 else 0
+            self._tiles[tile]['foreground'].opacity = fade_out[time]
                 
     
     def highlight_tile(self, hex: Hex):
@@ -247,4 +249,4 @@ class HexGrid:
         
         next_position = HexOrientation.center(new_tile, self._radius, self._origin)
         self.player.add_next_position((round(next_position[0][0]), round(next_position[1][0])))
-        self._player_trail.append(new_tile)
+        self._player_trail[new_tile] = 0
