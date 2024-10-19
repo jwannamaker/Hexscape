@@ -6,10 +6,8 @@ import pyglet
 from pyglet import gl
 from pyglet.window import key, mouse
 
-from circle import Circle
+from board import HexBoard
 from font import Font
-from button import Button
-from hex import HexGrid, Hex
 from player import Player
 from timer import Timer
 from resources import hex_image, ball_image, intro, full_track
@@ -28,9 +26,7 @@ audio_player.volume = 0.1
 audio_player.loop = True
 audio_player.queue(intro)
 
-circle_manager = Circle()
 font_manager = Font(64, 64, main_window.width, main_window.height, main_batch)
-button_manager = Button(main_window)
 timer = Timer(main_window.width, main_window.height, background_batch)
 
 font_manager.write('Level 1', 0, main_window.height-64)
@@ -40,7 +36,7 @@ player = Player(img=ball_image,
                 y=main_window.height//2,
                 batch=main_batch)
 player_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
-board = HexGrid(radius=32, 
+board = HexBoard(radius=32, 
                 grid_size=8, 
                 origin_x=main_window.width//2, 
                 origin_y=main_window.height//2, 

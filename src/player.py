@@ -44,7 +44,7 @@ class Player(pyglet.sprite.Sprite):
         self.current_position = pyglet.math.Vec2(self.x, self.y)
         destination = self.current_position if len(self.next_position) == 0 else self.next_position[0]
         distance = self.current_position.distance(destination)
-        if distance > 0.01:
+        if distance > 1:
             self._movable = False
             self.x += ((destination[0] - self.x) / distance) * dt * 100
             self.y += ((destination[1] - self.y) / distance) * dt * 100

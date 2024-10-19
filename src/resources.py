@@ -44,14 +44,16 @@ intro = pyglet.resource.media('intro.mp3', False)
 full_track = pyglet.resource.media('Piano_bipFullTrack.wav', True)
 
 # Find color fade in/out values
+fade_time = 800
+
 control_pt_1 = pyglet.math.Vec2(0, 255)
-control_pt_2 = pyglet.math.Vec2(822, 190)
-control_pt_3 = pyglet.math.Vec2(300, 110)
-control_pt_4 = pyglet.math.Vec2(1200, 0)
+control_pt_2 = pyglet.math.Vec2(400, 70)
+control_pt_3 = pyglet.math.Vec2(700, 255)
+control_pt_4 = pyglet.math.Vec2(fade_time, 0)
 
 fade_out = {}
-for t in range(0, 1200):
-    alpha = t / 1200
+for t in range(0, fade_time):
+    alpha = t / fade_time
     midpoint_a = control_pt_1.lerp(control_pt_2, alpha)
     midpoint_b = control_pt_2.lerp(control_pt_3, alpha)
     midpoint_c = control_pt_3.lerp(control_pt_4, alpha)
@@ -61,7 +63,4 @@ for t in range(0, 1200):
     
     point = midpoint_d.lerp(midpoint_e, alpha)
     fade_out[t] = round(point.y)
-    
-for time, opacity in list(fade_out.items()):
-    print(f'{time}\t{opacity}')
 
