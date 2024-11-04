@@ -23,5 +23,5 @@ for ax, palette, title in zip(axes, [red_palette, blue_palette, purple_palette],
     ax.set_yticks([])
     ax.set_title(title)
 
-plt.tight_layout()
+# plt.tight_layout()
 plt.show()

@@ -7,6 +7,12 @@ from player import Player
 from resources import bop_laser_sound, click_sound, fade_out, palette
 
 
+class Tile:
+    visited = False
+    walls = HexOrientation.ADJACENT_DIRECTION
+    
+
+
 class HexBoard:
     """ 
     radius:     pixel measurement of radius for a hex tile
@@ -49,10 +55,11 @@ class HexBoard:
         corresponding to the tile at hex. """
         center_x, center_y = HexOrientation.center(hex, self._radius, self._origin)
         background = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius, center_x, center_y),
-                                           color=palette['blue'][1],
+                                           color=palette['green'][0],
                                            batch=self._batch)
+        background.opacity = 0
         foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 4, center_x, center_y),
-                                           color=palette['blue'][0],
+                                           color=palette['white'][0],
                                            batch=self._batch)
         foreground.opacity = 0
         return {'background': background, 'foreground': foreground}
@@ -60,7 +67,8 @@ class HexBoard:
     def nearby(self, hex: Hex, search_distance: int):
         """ Returns a list of hex coordinates within search_distance to the given 
         hex coordinate.
-        Note: The coordinates WILL need to be validated by the map.
+        Note: The coordinates WILL need to be validated by the map. This method
+        only provides the hex coordinates to search.
         """
         results = []
         for q in range(-search_distance, search_distance + 1, 1):
@@ -78,7 +86,7 @@ class HexBoard:
 
     def boundary_check(self, pre_move: Hex, direction: str):
         post_move = pre_move + HexOrientation.ADJACENT_DIRECTION[direction]
-        if post_move.distance_to(Hex(0, 0, 0)) <= self._grid_size:
+        if post_move in self._tiles:
             return post_move
         bop_laser_sound.play()
         return pre_move
@@ -88,21 +96,9 @@ class HexBoard:
             self._player_trail[tile] += 1 if time < len(fade_out) - 1 else 0
             self._tiles[tile]['foreground'].opacity = fade_out[time]
 
-
     def highlight_tile(self, hex: Hex):
         """ Highlight the tile using the hex coordinate. """
         self._tiles[hex]['background'].color = palette['green'][0]
-
-    def highlight(self, screen_x: int, screen_y: int, color: str):
-        """ Highlight the tile that contains the given screen-space coordinate.
-        """
-        for tile in self._tiles.values():
-            if (screen_x, screen_y) in tile[0]:
-                tile['background'].color = palette[color][3]
-                tile['foreground'].color = palette[color][2]
-            else:
-                tile['background'].color = palette['green'][0]
-                tile['foreground'].color = palette['green'][0]
 
     def move_player(self, direction: str):
         click_sound.play()

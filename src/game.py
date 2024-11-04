@@ -9,8 +9,7 @@ from pyglet.window import key, mouse
 from board import HexBoard
 from font import Font
 from player import Player
-from timer import Timer
-from resources import hex_image, ball_image, intro, full_track
+from resources import palette, hex_image, ball_image, intro, full_track
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -20,6 +19,8 @@ main_window.set_fullscreen(True)
 main_window.set_icon(hex_image)
 background_batch = pyglet.graphics.Batch()
 main_batch = pyglet.graphics.Batch()
+background_color = pyglet.shapes.Rectangle(0, 0, main_window.width, main_window.height,
+                                           color=palette['black'][0], batch=background_batch)
 
 audio_player = pyglet.media.Player()
 audio_player.volume = 0.1
@@ -27,7 +28,6 @@ audio_player.loop = True
 audio_player.queue(intro)
 
 font_manager = Font(64, 64, main_window.width, main_window.height, main_batch)
-timer = Timer(main_window.width, main_window.height, background_batch)
 
 font_manager.write('Level 1', 0, main_window.height-64)
 highlight_color = 'purple'
@@ -59,17 +59,17 @@ def on_key_press(symbol, modifiers):
     if symbol in player_controls and player.movable():
         """ Note: Axes are flipped and not in the intuitive orientation. """
         if symbol == key.Q:
-            board.move_player('DOWN_RIGHT')
-        if symbol == key.W:
-            board.move_player('DOWN')
-        if symbol == key.E:
-            board.move_player('DOWN_LEFT')
-        if symbol == key.A:
             board.move_player('UP_LEFT')
-        if symbol == key.S:
+        if symbol == key.W:
             board.move_player('UP')
-        if symbol == key.D:
+        if symbol == key.E:
             board.move_player('UP_RIGHT')
+        if symbol == key.A:
+            board.move_player('DOWN_LEFT')
+        if symbol == key.S:
+            board.move_player('DOWN')
+        if symbol == key.D:
+            board.move_player('DOWN_RIGHT')
         clock.schedule(player.move)
     
 @main_window.event

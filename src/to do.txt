@@ -1,0 +1,23 @@
+- add bfs algorithm for proceedurally generating a maze
+- initialize each of them as a 'wall'
+- save the tilemap in a .json
+
+-- introduce new mechanic where the ball glows stronger and stronger
+    the closer you are to the 'goalpoints'
+
+-- add a dialog to the game
+    -> the big picture should be that you can't go back. you can't know
+    if which way youre heading is the right way or not, but you have to 
+    keep moving.
+    -> emphasis on memory, sounds, attention to details
+
+-- add controls/actions
+    -> place a waypoint
+    -> send out a sound, an echolocation of sorts. 
+    -> GREEN highlights the other waypoints on the map temporarily
+    -> RED lets you tear through walls temporarily
+    -> YELLOW/ORGANGE lights up all the tiles surrounding you temporarily
+    -> PURPLE* lets you teleport? maybe faintly highlight the places you 
+        should be moving to?
+
+-- ethereal music

@@ -62,8 +62,6 @@ class HexOrientation:
     j = np.array([0,      np.sqrt(3)])
     hex_to_pixel = np.column_stack([i, j])
     pixel_to_hex = np.linalg.inv(hex_to_pixel)
-    
-    corner_angles = np.arange(0, 360, 60)
 
     @staticmethod
     def center(hex: Hex, radius: int, origin: np.ndarray):
@@ -73,7 +71,7 @@ class HexOrientation:
     @staticmethod
     def corners(radius: int, center_x: int, center_y: int):
         corners = []
-        for angle in HexOrientation.corner_angles:
+        for angle in np.arange(0, 360, 60):
             x = radius * np.cos(np.deg2rad(angle)) + center_x
             y = radius * np.sin(np.deg2rad(angle)) + center_y
             corners.append((x, y))
@@ -84,13 +82,13 @@ class HexOrientation:
         """ Convert the screen coordinate to a hexagon coordinate. """
         return HexOrientation.round(((screen_pos - origin) / radius) @ HexOrientation.pixel_to_hex)
     
-    ADJACENT_DIRECTION = {
-        'UP_RIGHT':   Hex(+1, -1,  0), # E
-        'UP':         Hex( 0, -1, +1), # W
-        'UP_LEFT':    Hex(-1,  0, +1), # Q
-        'DOWN_RIGHT': Hex(-1, +1,  0), # D
-        'DOWN':       Hex( 0, +1, -1), # S
-        'DOWN_LEFT':  Hex(+1,  0, -1)  # A
+    ADJACENT_DIRECTION = {             # Prev    NOW
+        'UP_RIGHT':   Hex(+1,  0, -1), # D       E
+        'UP':         Hex( 0, +1, -1), # S       W
+        'UP_LEFT':    Hex(-1, +1,  0), # A       Q
+        'DOWN_RIGHT': Hex(+1, -1,  0), # Q       D
+        'DOWN':       Hex( 0, -1, +1), # W       S
+        'DOWN_LEFT':  Hex(-1,  0, +1)  # E       A
     }
     
     DIAGONAL_DIRECTION = {
@@ -128,15 +126,3 @@ class HexOrientation:
         else:
             s = -q - r
         return Hex(q, r, s)
-
-# class Player:
-#     def __init__(self, initial_position: Hex):
-#         self._hex = initial_position
-#         self._color = palette['red'][0]
-        
-#     def place(self, new_position):
-#         self._hex = new_position
-        
-#     def move(self, direction: str):
-#         self._hex = HexOrientation.neighbor(self._hex, direction)
-
