@@ -29,6 +29,7 @@ def z_rotation(point, angle):
 
 @dataclass
 class Hex:
+    """ Baseclass for anything taking place on a hexagonal grid. """
     q: int
     r: int
     s: int
@@ -66,7 +67,8 @@ class HexOrientation:
     @staticmethod
     def center(hex: Hex, radius: int, origin: np.ndarray):
         """ Return the center of the hexagon in pixel coordinates. """
-        return ((radius * HexOrientation.hex_to_pixel) @ hex.vector()) + origin
+        center = ((radius * HexOrientation.hex_to_pixel) @ hex.vector()) + origin
+        return round(center[0][0]), round(center[1][0])
 
     @staticmethod
     def corners(radius: int, center_x: int, center_y: int):
@@ -110,6 +112,26 @@ class HexOrientation:
         return hex # No neighbor was found, so return the original coordinate
     
     @staticmethod
+    def neighbors(hex: Hex):
+        return [hex + direction for direction in list(HexOrientation.ADJACENT_DIRECTION.values())]
+    
+    @staticmethod
+    def search_nearby(hex: Hex, search_distance: int):
+        """ Returns a list of hex coordinates within search_distance to the given 
+        hex coordinate.
+        """
+        results = []
+        for q in range(-search_distance, search_distance + 1, 1):
+            # Find only the revelvant values for r to iterate over, considering
+            # q + r + s == 0
+            start_r = max(-search_distance, -q - search_distance)
+            stop_r = min(search_distance, -q + search_distance)
+            for r in range(start_r, stop_r + 1, 1):
+                s = -q - r
+                results.append(hex + Hex(q, r, s))
+        return results
+    
+    @staticmethod
     def round(frac_q: float, frac_r: float, frac_s: float):
         q = round(q)
         r = round(r)
@@ -126,3 +148,13 @@ class HexOrientation:
         else:
             s = -q - r
         return Hex(q, r, s)
+    
+def generate_square_grid(grid_size):
+    coordinates: list[Hex] = []
+    for q in range(-grid_size, grid_size + 1, 1):
+        start_r = max(-grid_size, -q - grid_size)
+        stop_r = min(grid_size, -q + grid_size)
+        for r in range(start_r, stop_r + 1, 1):
+            s = -q - r
+            coordinates.append(Hex(q, r, s))
+    return coordinates

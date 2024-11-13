@@ -1,28 +1,80 @@
+import random
+
 import numpy as np
 import pyglet
 
-
-from hex import Hex, HexOrientation
+from hex import Hex
+from hex import HexOrientation as hex_util
+from hex import generate_square_grid
 from player import Player
-from resources import bop_laser_sound, click_sound, fade_out, palette
+from resources import click_sound, fade_out, palette, tile_walls
 
 
-class Tile:
-    visited = False
-    walls = HexOrientation.ADJACENT_DIRECTION
+def waypoint(type: str):
+    if type == 'green':
+        return 'highlight the other waypoints on the map'
+    if type == 'red':
+        return 'break through walls'
+    if type == 'yellow':
+        return 'light up surrounding tiles'
+    if type == 'purple':
+        return 'teleport to a different tile'
+    return 'generic tile'
+
+
+class HexCell:
+    def __init__(self, hex_coordinate: Hex, radius: int, screen_origin: np.ndarray, 
+                 background_color: str, batch: pyglet.graphics.Batch):
+        self.hex_coordinate = hex_coordinate
+        
+        self.center_x = hex_util.center(self.hex_coordinate, radius, screen_origin)[0]
+        self.center_y = hex_util.center(self.hex_coordinate, radius, screen_origin)[1]
+        self.background = pyglet.shapes.Polygon(*hex_util.corners(radius, self.center_x, self.center_y),
+                                                color=palette[background_color][0],
+                                                batch=batch)
+        self.background.opacity = 0
+        
+        # For maze generation
+        self.walls = {neighbor: True for neighbor in hex_util.neighbors(self.hex_coordinate)}
+        self.visited = False
     
-
-
+    def wall_sprite(self, wall: str, batch: pyglet.graphics.Batch):
+        return pyglet.sprite.Sprite(tile_walls[wall], x=self.center_x, y=self.center_y,
+                                    batch=batch)
+    
+    def coordinate(self):
+        return self.hex_coordinate
+    
+    def visit(self):
+        self.visited = True
+    
+    def unvisited(self):
+        return not self.visited
+    
+    def remove_wall(self, neighbor: 'HexCell'):
+        if self.walls[neighbor.coordinate()]:
+            self.walls[neighbor.coordinate()] = False
+    
+    def neighbors(self):
+        """ Returns the list of all neighbors that don't have a wall between them. """
+        neighbors = []
+        for neighbor, wall in list(self.walls.items()):
+            if not wall:
+                neighbors.append(neighbor)
+        return neighbors
+    
+    def fade(self, opacity):
+        self.background.opacity = opacity   
+    
+    def highlight(self):
+        self.background.opacity = 255
+    
+    
 class HexBoard:
     """ 
     radius:     pixel measurement of radius for a hex tile
     grid_size:  int for creating a 'square' hex grid (each side length matches 
-                this int)
-    origin_x:   x coordinate in pixels for center of origin tile
-    origin_y:   y coordinate in pixels for center of origin tile
-    batch:      batch that the board is rendered with
-    player:     player that gets placed on the board
-    clock:      clock from the running app
+                this)
     """
     def __init__(self, radius: int, grid_size: int, origin_x: int, origin_y: int,
                  batch: pyglet.graphics.Batch, player: Player):
@@ -30,75 +82,39 @@ class HexBoard:
         self._grid_size = grid_size
         self._origin = np.row_stack([origin_x, origin_y])
         self._batch = batch
-
-        self._tiles = {}
-        for q in range(-self._grid_size, self._grid_size + 1, 1):
-            start_r = max(-self._grid_size, -q - self._grid_size)
-            stop_r = min(self._grid_size, -q + self._grid_size)
-            for r in range(start_r, stop_r + 1, 1):
-                s = -q - r
-                new_tile = Hex(q, r, s)
-                self._tiles[new_tile] = self.tile(new_tile)
-
+        
+        self._tiles = {coordinate: HexCell(coordinate, self._radius, self._origin, 'white', self._batch) 
+                       for coordinate in generate_square_grid(self._grid_size)}
+        
         self.player_pos = Hex(0, 0, 0)
         self.player = player
         self._player_trail = dict()
         self._player_trail[self.player_pos] = 0
+        self._hit_walls = []
         self.highlight_tile(self.player_pos)
-
-    def tile(self, hex: Hex):
-        """ Return a dict with entries
-            [
-                'background': pyglet.shapes.Polygon, 
-                'foreground': pyglet.shapes.Polygon
-            ]
-        corresponding to the tile at hex. """
-        center_x, center_y = HexOrientation.center(hex, self._radius, self._origin)
-        background = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius, center_x, center_y),
-                                           color=palette['green'][0],
-                                           batch=self._batch)
-        background.opacity = 0
-        foreground = pyglet.shapes.Polygon(*HexOrientation.corners(self._radius - 4, center_x, center_y),
-                                           color=palette['white'][0],
-                                           batch=self._batch)
-        foreground.opacity = 0
-        return {'background': background, 'foreground': foreground}
-
-    def nearby(self, hex: Hex, search_distance: int):
-        """ Returns a list of hex coordinates within search_distance to the given 
-        hex coordinate.
-        Note: The coordinates WILL need to be validated by the map. This method
-        only provides the hex coordinates to search.
-        """
-        results = []
-        for q in range(-search_distance, search_distance + 1, 1):
-            # Find only the revelvant values for r to iterate over, considering
-            # q + r + s == 0
-            start_r = max(-search_distance, -q - search_distance)
-            stop_r = min(search_distance, -q + search_distance)
-            for r in range(start_r, stop_r + 1, 1):
-                s = -q - r
-                results.append(hex + Hex(q, r, s))
-        return results
+        
+        self.generate_maze(self._tiles[self.player_pos])
 
     def __contains__(self, key: Hex):
         return key in self._tiles
-
+            
     def boundary_check(self, pre_move: Hex, direction: str):
-        post_move = pre_move + HexOrientation.ADJACENT_DIRECTION[direction]
+        post_move = hex_util.neighbor(pre_move, direction)
         if post_move in self._tiles:
-            return post_move
-        bop_laser_sound.play()
-        return pre_move
+            if not self._tiles[post_move].walls[pre_move]:
+                return post_move
+        # Show what's blocking the way
+        new_wall_sprite = self._tiles[pre_move].wall_sprite(direction, self._batch)
+        self._hit_walls.append(new_wall_sprite)
+        return pre_move 
 
     def fade_tile(self, dt: float):
         for tile, time in list(self._player_trail.items()):
             self._player_trail[tile] += 1 if time < len(fade_out) - 1 else 0
-            self._tiles[tile]['foreground'].opacity = fade_out[time]
-
+            self._tiles[tile].fade(fade_out[time])    
+    
     def highlight_tile(self, hex: Hex):
-        """ Highlight the tile using the hex coordinate. """
-        self._tiles[hex]['background'].color = palette['green'][0]
+        self._tiles[hex].highlight()
 
     def move_player(self, direction: str):
         click_sound.play()
@@ -106,6 +122,33 @@ class HexBoard:
         self.player_pos = new_tile
         self.highlight_tile(self.player_pos)
 
-        next_position = HexOrientation.center(new_tile, self._radius, self._origin)
-        self.player.add_next_position((round(next_position[0][0]), round(next_position[1][0])))
+        next_position = hex_util.center(new_tile, self._radius, self._origin)
+        self.player.add_next_position(next_position)
         self._player_trail[new_tile] = 0
+
+    def remove_wall(self, cell_a: HexCell, cell_b: HexCell):
+        if cell_a.coordinate() in cell_b.walls:
+            cell_b.remove_wall(cell_a)
+        if cell_b.coordinate() in cell_a.walls:
+            cell_a.remove_wall(cell_b)
+    
+    def unvisited_neighbors(self, tile: HexCell):
+        neighbors = hex_util.neighbors(tile.coordinate())
+        return [self._tiles[neighbor] for neighbor in neighbors if neighbor in self._tiles and self._tiles[neighbor].unvisited()]
+
+    def generate_maze(self, current_tile: HexCell):
+        if current_tile.unvisited():
+            current_tile.visit()
+        
+        neighbors = self.unvisited_neighbors(current_tile)
+        random.shuffle(neighbors)
+    
+        for potential_neighbor in neighbors:
+            if potential_neighbor.coordinate() in self._tiles:
+                neighbor_tile = self._tiles[potential_neighbor.coordinate()]
+                
+                if neighbor_tile.unvisited():
+                    self.remove_wall(current_tile, neighbor_tile)
+                    self.generate_maze(neighbor_tile)
+            
+        

@@ -35,6 +35,14 @@ def center_anchor(img: pyglet.image.TextureRegion):
 hex_image = pyglet.resource.image('dusk-hexagon-64x64.png')
 center_anchor(hex_image)
 
+hex_wall_image = pyglet.resource.image('hexagon_tile_walls.png')
+wall_textures = pyglet.image.ImageGrid(hex_wall_image, rows=1, columns=6, 
+                                       item_width=64, item_height=64)
+for texture in wall_textures:
+    center_anchor(texture)
+wall_names = ['UP', 'UP_RIGHT', 'DOWN_RIGHT', 'DOWN', 'DOWN_LEFT', 'UP_LEFT']
+tile_walls = {wall_names[i]: wall_textures[i] for i in range(len(wall_names))}
+
 ball_image = pyglet.resource.image('simple-ball-32x32.png')
 center_anchor(ball_image)
 
@@ -43,8 +51,8 @@ click_sound = pyglet.resource.media('click.wav', False)
 intro = pyglet.resource.media('intro.mp3', False)
 full_track = pyglet.resource.media('Piano_bipFullTrack.wav', True)
 
-# Find color fade in/out values
-fade_time = 800
+# Calculate color fade in/out values
+fade_time = 12000
 
 control_pt_1 = pyglet.math.Vec2(0, 255)
 control_pt_2 = pyglet.math.Vec2(400, 70)

@@ -6,7 +6,7 @@ import pyglet
 from pyglet import gl
 from pyglet.window import key, mouse
 
-from board import HexBoard
+from board import HexBoard, HexCell
 from font import Font
 from player import Player
 from resources import palette, hex_image, ball_image, intro, full_track
@@ -28,8 +28,8 @@ audio_player.loop = True
 audio_player.queue(intro)
 
 font_manager = Font(64, 64, main_window.width, main_window.height, main_batch)
+# font_manager.write('Level 1', 0, main_window.height-64)
 
-font_manager.write('Level 1', 0, main_window.height-64)
 highlight_color = 'purple'
 player = Player(img=ball_image, 
                 x=main_window.width//2, 
