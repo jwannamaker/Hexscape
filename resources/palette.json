@@ -1,11 +1,11 @@
 {
-    "red": ["#9a031e", "#d75555"],
-    "orange": ["#e36414", "#f09358"],
-    "yellow": ["#e3cd6f", "#f1e5b3"],  
-    "green": ["#3a683a", "#54845c", "#75a697", "#9fc3ad"],
-    "blue": ["#294257", "#69809e", "#9fa3c3"],
-    "purple": ["#683a68", "#9775a6", "#c7a6cc", "#e5cce5"],
-    "brown": ["#573e29", "#a69775"],
-    "white": ["#ffffff"],
-    "black": ["#24272e"]
+    "red": ["#9a031eff", "#d75555ff"],
+    "orange": ["#e36414ff", "#f09358ff"],
+    "yellow": ["#e3cd6fff", "#f1e5b3ff"],  
+    "green": ["#3a683aff", "#54845cff", "#75a697ff", "#9fc3adff"],
+    "blue": ["#294257ff", "#69809eff", "#9fa3c3ff"],
+    "purple": ["#683a68ff", "#9775a6ff", "#c7a6ccff", "#e5cce5ff"],
+    "brown": ["#573e29ff", "#a69775ff"],
+    "white": ["#ffffffff"],
+    "black": ["#24272eff"]
 }
