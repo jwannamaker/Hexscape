@@ -12,11 +12,6 @@ pyglet.resource.path = ['../resources',
                         '../resources/images']
 pyglet.resource.reindex()
 
-""" 
-A dict for the palette with 
-    k: string name of color
-    v: list of RGB int tuples
-"""
 palette: dict[str, int] = json.load(pyglet.resource.file('palette.json'))
 for key in palette:
     converted_values = []

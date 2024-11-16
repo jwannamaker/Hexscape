@@ -6,7 +6,8 @@ import pyglet
 from pyglet import gl
 from pyglet.window import key, mouse
 
-from board import HexBoard, HexCell
+from board import HexBoard
+from cell import HexCell
 from font import Font
 from player import Player
 from resources import palette, hex_image, ball_image, intro, full_track

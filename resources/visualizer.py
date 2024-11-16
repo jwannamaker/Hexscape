@@ -1,27 +1,46 @@
+import json
+import pyglet
+from pyglet import gl
 from PIL import ImageColor
-import matplotlib.pyplot as plt
+
+gl.glEnable(gl.GL_BLEND)
+gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+
 
 def convert(hex_color_string):
     return ImageColor.getrgb(hex_color_string)
 
-# Define the color palettes
-red_palette = ["#330000", "#660000", "#990000", "#cc0000", "#ff0000", "#ff3333", "#ff6666", "#ff9999"]
-blue_palette = ["#191b1a", "#294257", "#579c9a", "#99c9b3", "#cce5df", "#e5f2f0"]
-purple_palette = ["#2d162c", "#412752", "#683a68", "#9775a6", "#c7a6cc", "#e5cce5"]
+palette = json.load(pyglet.resource.file('palette.json'))
+for key in palette:
+    converted_values = []
+    for value in palette[key]:
+        converted_values.append(ImageColor.getrgb(value))
+    palette[key] = converted_values
+    
+tile_width, tile_height = 100, 100
+window = pyglet.window.Window(tile_width*len(palette), tile_height*4)
+# window.set_fullscreen(True)
+general_batch = pyglet.graphics.Batch()
+        
+rectangles = []
+j = 0
+for key in list(palette.keys()):
+    for i in range(len(palette[key])):
+        rectangle = pyglet.shapes.Rectangle(x=j, y=i*tile_height, 
+                                            width=tile_width, height=tile_height,
+                                            color=palette[key][i], 
+                                            batch=general_batch)
+        rectangles.append(rectangle)
+    j += tile_width
 
-red_palette = [convert(c) for c in red_palette]
-blue_palette = [convert(c) for c in blue_palette]
-purple_palette = [convert(c) for c in purple_palette]
+@window.event
+def on_draw():
+    window.clear()
+    general_batch.draw()
 
-# Plot the color palettes
-fig, axes = plt.subplots(3, 1)
-
-for ax, palette, title in zip(axes, [red_palette, blue_palette, purple_palette], ['Red', 'Blue', 'Purple']):
-    ax.imshow([palette], aspect='equal')
-    ax.set_xticks(range(len(palette)))
-    ax.set_xticklabels(palette)
-    ax.set_yticks([])
-    ax.set_title(title)
-
-# plt.tight_layout()
-plt.show()
+@window.event
+def on_key_release(symbol, modifiers):
+    pyglet.image.get_buffer_manager().get_color_buffer().save('palette.png')
+    
+if __name__ == '__main__':
+    pyglet.app.run()
