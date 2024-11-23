@@ -17,6 +17,7 @@
     -> YELLOW lights up all the tiles surrounding you temporarily
     -> GREEN highlights the other waypoints on the map temporarily
     -> PURPLE teleports you to another waypoint (or within __(random)__ distance of one)
+    -> BLUE slides you until you hit a wall every time you move (**find a better way to phrase this lmao)
 
 -- add excitement to the music
     -> add a layer to the music for each waypoint discovered

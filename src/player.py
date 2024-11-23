@@ -3,32 +3,9 @@ from collections import deque
 import pyglet
 import numpy as np
 
-"""
-# STATUS STATS
-- health points + any boosters
-- attack points + any boosters
-- defense points + any boosters
+from waypoint import Waypoint
 
-# LEVEL STATS *[could potentially move to a different class]
-- current level 
-- score
 
-# ACTION STATS
-- available moves
-- number of moves left
-- available attack patterns
-
-## Note
-
-- Player is really just a sprite, and will interact with the board by requesting 
-the appropriate info for
-    - ACTION STATS
-    - Positioning the sprite in the center of a certain grid tile
-    - Getting the tile position by using the board's ability to convert screen 
-    coordinates into tile positions and vice versa
-
-"""
-    
 class Player(pyglet.sprite.Sprite):
     def __init__(self, img: pyglet.image.Texture, x: int, y: int, 
                  batch: pyglet.graphics.Batch):
@@ -36,6 +13,9 @@ class Player(pyglet.sprite.Sprite):
         self.current_position = pyglet.math.Vec2(self.x, self.y)
         self.next_position = deque([])
         self._movable = True
+        
+        self.waypoint_collection = {}
+        self.timers = deque(maxlen=1)
     
     def movable(self):
         return self._movable
@@ -58,5 +38,13 @@ class Player(pyglet.sprite.Sprite):
         position = pyglet.math.Vec2(*screen_position)
         if position not in self.next_position:
             self.next_position.append(pyglet.math.Vec2(*screen_position))
-        
     
+    def collect_waypoint(self, waypoint: Waypoint):
+        self.waypoint_collection[waypoint.color()] = waypoint
+    
+    def activate_waypoint(self, color: str):
+        if color in self.waypoint_collection and color not in self.timers:
+            self.waypoint_collection[color].activate()
+            
+    def actionable(self):
+        return len(self.waypoint_collection)

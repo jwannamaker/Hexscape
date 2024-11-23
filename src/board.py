@@ -2,11 +2,13 @@ import random
 
 import numpy as np
 import pyglet
+import pyglet.event
 
 from cell import HexCell
 from hex import Hex
 from hex import HexOrientation as hex_util
 from hex import generate_square_grid
+from waypoint import Waypoint, RedWaypoint, GreenWaypoint, BlueWaypoint, YellowWaypoint
 from player import Player
 from resources import click_sound, fade_out
 
@@ -18,11 +20,12 @@ class HexBoard:
                 this)
     """
     def __init__(self, radius: int, grid_size: int, origin_x: int, origin_y: int,
-                 batch: pyglet.graphics.Batch, player: Player):
+                 batch: pyglet.graphics.Batch, player: Player, window: pyglet.window):
         self._radius = radius
         self._grid_size = grid_size
         self._origin = np.row_stack([origin_x, origin_y])
         self._batch = batch
+        self._window = window
         
         self._tiles = {coordinate: HexCell(coordinate, self._radius, self._origin, 'white', self._batch) 
                        for coordinate in generate_square_grid(self._grid_size)}
@@ -34,10 +37,15 @@ class HexBoard:
         self._hit_walls = []
         self.highlight_tile(self.player_pos)
         
-        self.generate_maze(self._tiles[self.player_pos])
+        self.start_level(1)
 
     def __contains__(self, key: Hex):
         return key in self._tiles
+            
+    def start_level(self, level: int):
+        if level == 1:
+            self.generate_maze(self._tiles[self.player_pos])
+            self.place_waypoints([1, 2, 3], [RedWaypoint(), BlueWaypoint(), GreenWaypoint()])
             
     def boundary_check(self, pre_move: Hex, direction: str):
         post_move = hex_util.neighbor(pre_move, direction)
@@ -62,11 +70,23 @@ class HexBoard:
         new_tile = self.boundary_check(self.player_pos, direction)
         self.player_pos = new_tile
         self.highlight_tile(self.player_pos)
-
+        
+        potential_waypoint = self._tiles[self.player_pos].waypoint()
+        if isinstance(potential_waypoint, Waypoint):
+            self.player.collect_waypoint(potential_waypoint)
+            pyglet.event.EventDispatcher.dispatch_event(self._window,
+                                                        'on_waypoint_discovered',
+                                                        potential_waypoint.ability_description())
+        
         next_position = hex_util.center(new_tile, self._radius, self._origin)
         self.player.add_next_position(next_position)
         self._player_trail[new_tile] = 0
 
+    def place_waypoints(self, player_distances: list[int], waypoints: list[Waypoint]):
+        for dist, waypoint in zip(player_distances, waypoints):
+            potential_tiles = hex_util.search_nearby(self.player_pos, random.randint(dist, dist+1))
+            self._tiles[random.choice(potential_tiles)].place_waypoint(waypoint)
+    
     def remove_wall(self, cell_a: HexCell, cell_b: HexCell):
         if cell_a.coordinate() in cell_b.walls:
             cell_b.remove_wall(cell_a)
@@ -76,7 +96,7 @@ class HexBoard:
     def unvisited_neighbors(self, tile: HexCell):
         neighbors = hex_util.neighbors(tile.coordinate())
         return [self._tiles[neighbor] for neighbor in neighbors if neighbor in self._tiles and self._tiles[neighbor].unvisited()]
-
+    
     def generate_maze(self, current_tile: HexCell):
         if current_tile.unvisited():
             current_tile.visit()

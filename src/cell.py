@@ -1,9 +1,9 @@
-from hex import Hex, HexOrientation as hex_util
-from resources import palette, tile_walls
-
-
 import numpy as np
 import pyglet
+
+from hex import Hex, HexOrientation as hex_util
+from waypoint import Waypoint
+from resources import palette, tile_walls
 
 
 class HexCell:
@@ -21,6 +21,7 @@ class HexCell:
         # For maze generation
         self.walls = {neighbor: True for neighbor in hex_util.neighbors(self.hex_coordinate)}
         self.visited = False
+        self._waypoint = None
 
     def wall_sprite(self, wall: str, batch: pyglet.graphics.Batch):
         return pyglet.sprite.Sprite(tile_walls[wall], x=self.center_x, y=self.center_y,
@@ -47,8 +48,18 @@ class HexCell:
                 neighbors.append(neighbor)
         return neighbors
 
+    def place_waypoint(self, waypoint: Waypoint):
+        self._waypoint = waypoint
+    
+    def waypoint(self):
+        if isinstance(self._waypoint, Waypoint):
+            return self._waypoint
+        return False
+    
     def fade(self, opacity):
         self.background.opacity = opacity
 
     def highlight(self):
+        if isinstance(self._waypoint, Waypoint):
+            self.background.color = self._waypoint.color()
         self.background.opacity = 255
