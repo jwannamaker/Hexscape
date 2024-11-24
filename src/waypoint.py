@@ -35,6 +35,7 @@ class RedWaypoint(Waypoint):
         return self.duration() - dt
     
     def activate(self):
+        """ Might need to add a parameter to keep reference of the timer used. """
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(self.countdown, 0.1, self.duration())
     
@@ -118,6 +119,7 @@ class GreenWaypoint(Waypoint):
     
     def duration(self):
         return 15.0
+    
     
 class BlueWaypoint(Waypoint):
     def countdown(self, dt: float):

@@ -24,8 +24,10 @@ class HexCell:
         self._waypoint = None
 
     def wall_sprite(self, wall: str, batch: pyglet.graphics.Batch):
-        return pyglet.sprite.Sprite(tile_walls[wall], x=self.center_x, y=self.center_y,
-                                    batch=batch)
+        sprite = pyglet.sprite.Sprite(tile_walls[wall], x=self.center_x, y=self.center_y,
+                                      batch=batch)
+        sprite.scale = 2.0
+        return sprite
 
     def coordinate(self):
         return self.hex_coordinate

@@ -20,9 +20,14 @@ main_window.set_fullscreen(True)
 main_window.set_icon(hex_image)
 main_window.set_caption('hexscape')
 main_window.register_event_type('on_waypoint_discovered')
+main_window.register_event_type('on_point_scored')
+main_window.register_event_type('on_next_level')
+main_window.register_event_type('on_game_over')
+main_window.register_event_type('on_menu')
 
 
 background_batch = pyglet.graphics.Batch()
+font_group = pyglet.graphics.Group(order=3)
 main_batch = pyglet.graphics.Batch()
 background_color = pyglet.shapes.Rectangle(0, 0, main_window.width, main_window.height,
                                            color=palette['black'][0], batch=background_batch)
@@ -34,8 +39,8 @@ audio_player.loop = True
 audio_player.queue(intro)
 
 
-font_manager = Font(64, 64, main_window.width, main_window.height, main_batch)
-# font_manager.write('Level 1', 0, main_window.height-64)
+font_manager = Font(32, 32, main_window.width, main_window.height, background_batch, font_group)
+font_manager.write('Level 1', 0, main_window.height-64)
 
 
 player = Player(img=ball_image, 
@@ -43,10 +48,13 @@ player = Player(img=ball_image,
                 y=main_window.height//2,
                 batch=main_batch)
 player_movement_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
-player_action_controls = [key.R, key.G]
+player_action_controls = [key.R]
 
 
-board = HexBoard(radius=32, 
+hud_label = pyglet.text.Label('', 'Mono', 24, x=0, y=20, batch=main_batch, group=font_group)
+
+
+board = HexBoard(radius=64, 
                  grid_size=4, 
                  origin_x=main_window.width//2, 
                  origin_y=main_window.height//2, 
@@ -89,8 +97,9 @@ def on_key_press(symbol, modifiers):
             player.activate_waypoint('red')
 
 @main_window.event
-def on_waypoint_discovered(ability_description: str):
-    font_manager.write(ability_description, 10, 74)
+def on_waypoint_discovered(color: tuple[int], ability_description: str):
+    hud_label.color = color
+    hud_label.text = ability_description.upper()
 
 @main_window.event
 def on_draw():

@@ -35,7 +35,7 @@ class HexBoard:
         self._player_trail = dict()
         self._player_trail[self.player_pos] = 0
         self._hit_walls = []
-        self.highlight_tile(self.player_pos)
+        self._tiles[self.player_pos].highlight()
         
         self.start_level(1)
 
@@ -61,15 +61,12 @@ class HexBoard:
         for tile, time in list(self._player_trail.items()):
             self._player_trail[tile] += 1 if time < len(fade_out) - 1 else 0
             self._tiles[tile].fade(fade_out[time])    
-    
-    def highlight_tile(self, hex: Hex):
-        self._tiles[hex].highlight()
 
     def move_player(self, direction: str):
         click_sound.play()
         new_tile = self.boundary_check(self.player_pos, direction)
         self.player_pos = new_tile
-        self.highlight_tile(self.player_pos)
+        self._tiles[self.player_pos].highlight()
         
         potential_waypoint = self._tiles[self.player_pos].waypoint()
         if isinstance(potential_waypoint, Waypoint):

@@ -14,13 +14,17 @@
 -- add waypoints and rooms around them
     -> RED lets you break through walls temporarily
     -> ORANGE lights the path to the nearest waypoint temporarily
-    -> YELLOW lights up all the tiles surrounding you temporarily
+    -> YELLOW lights up all the tiles surrounding you (and the walls) temporarily
     -> GREEN highlights the other waypoints on the map temporarily
-    -> PURPLE teleports you to another waypoint (or within __(random)__ distance of one)
-    -> BLUE slides you until you hit a wall every time you move (**find a better way to phrase this lmao)
+    -> PURPLE teleports you to another waypoint (or within __(randint(level-1, level+1))__ distance of one)
+    -> BLUE boosts every move to the longest possible (**find a better way to phrase this lmao)
 
 -- add excitement to the music
     -> add a layer to the music for each waypoint discovered
+    -> needs a good kick drum line
+    -> snare
+    -> hihat
+    -> guitar
 
 
 -- 

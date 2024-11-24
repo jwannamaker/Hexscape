@@ -3,7 +3,7 @@ from collections import deque
 import pyglet
 import numpy as np
 
-from waypoint import Waypoint
+from waypoint import Waypoint, RedWaypoint, OrangeWaypoint, YellowWaypoint, PurpleWaypoint, GreenWaypoint, BlueWaypoint
 
 
 class Player(pyglet.sprite.Sprite):
@@ -21,6 +21,7 @@ class Player(pyglet.sprite.Sprite):
         return self._movable
     
     def move(self, dt):
+        """ Address the way a player moves according to waypoints activated. """
         self.current_position = pyglet.math.Vec2(self.x, self.y)
         destination = self.current_position if len(self.next_position) == 0 else self.next_position[0]
         distance = self.current_position.distance(destination)
@@ -45,6 +46,9 @@ class Player(pyglet.sprite.Sprite):
     def activate_waypoint(self, color: str):
         if color in self.waypoint_collection and color not in self.timers:
             self.waypoint_collection[color].activate()
+            if isinstance(self.waypoint_collection[color], RedWaypoint):
+                """ Toggle something that changes the way the player moves """
+                pass
             
     def actionable(self):
         return len(self.waypoint_collection)
