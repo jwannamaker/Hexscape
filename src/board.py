@@ -8,7 +8,7 @@ from cell import HexCell
 from hex import Hex
 from hex import HexOrientation as hex_util
 from hex import generate_square_grid
-from waypoint import Waypoint, RedWaypoint, GreenWaypoint, BlueWaypoint, YellowWaypoint
+from waypoint import Waypoint, RedWaypoint, GreenWaypoint, BlueWaypoint, YellowWaypoint, PurpleWaypoint, OrangeWaypoint
 from player import Player
 from resources import click_sound, fade_out
 
@@ -45,7 +45,8 @@ class HexBoard:
     def start_level(self, level: int):
         if level == 1:
             self.generate_maze(self._tiles[self.player_pos])
-            self.place_waypoints([1, 2, 3], [RedWaypoint(), BlueWaypoint(), GreenWaypoint()])
+            self.place_waypoints([1, 2, 3, 4, 1, 2], 
+                                 [RedWaypoint(), BlueWaypoint(), GreenWaypoint(), PurpleWaypoint(), YellowWaypoint(), OrangeWaypoint()])
             
     def boundary_check(self, pre_move: Hex, direction: str):
         post_move = hex_util.neighbor(pre_move, direction)
