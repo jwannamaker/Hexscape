@@ -9,14 +9,14 @@ from pyglet.window import key, mouse
 from board import HexBoard
 from cell import HexCell
 from player import Player
-from resources import palette, hex_image, ball_image, intro
+from resources import palette, hex_icon, ball_image, intro, HUD
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
 main_window = pyglet.window.Window()
 main_window.set_fullscreen(True)
-main_window.set_icon(hex_image)
+main_window.set_icon(hex_icon)
 main_window.set_caption('hexscape')
 main_window.register_event_type('on_waypoint_discovered')
 main_window.register_event_type('on_point_scored')
@@ -46,17 +46,8 @@ player_movement_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
 player_action_controls = [key.R]
 
 
-pyglet.font.load('monogram')
-level_label = pyglet.text.Label('LEVEL 1', font_size=40, x=10, y=main_window.height-10, 
-                                anchor_y='top', font_name='monogram', 
-                                batch=main_batch, group=font_group)
-player_controls = 'CONTROLS\nQ: UP_LEFT\nW: UP\nE: UP_RIGHT\nA: DOWN_LEFT\nS: DOWN\nD: DOWN_RIGHT'
-player_controls_label = pyglet.text.Label(text=player_controls, font_size=40, 
-                                          x=main_window.width-10, y=main_window.height-10, 
-                                          anchor_x='right', anchor_y='top', width=480, 
-                                          multiline=True, align='right', font_name='monogram', 
-                                          batch=main_batch, group=font_group)
-hud_label = pyglet.text.Label('', font_size=40, x=10, y=10, font_name='monogram', 
+hud = HUD(main_window.width, main_window.height, 10, main_batch, font_group)
+hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', 
                               batch=main_batch, group=font_group)
 
 

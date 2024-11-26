@@ -1,10 +1,14 @@
 import string
 import json
 
-import pyglet
-from pyglet.font.user import UserDefinedMappingFont
 import numpy as np
 from PIL import ImageColor
+import pyglet.image
+import pyglet
+from pyglet.font.user import UserDefinedMappingFont
+from pyglet.text.document import InlineElement
+from pyglet.text.formats.structured import ImageElement
+from pyglet.text.layout import TextLayout
 
 pyglet.resource.path = ['../resources', 
                         '../resources/audio', 
@@ -23,15 +27,13 @@ for key in palette:
 keys = [*string.ascii_uppercase, *string.digits]
 values = [pyglet.resource.image(f'{char}.png').get_image_data() for char in keys]
 font_mapping = {k: v for k, v in zip(keys, values)}
-pyglet.font.add_user_font(UserDefinedMappingFont('pixelator', default_char='A', size=30, mappings=font_mapping))
+pyglet.font.add_user_font(UserDefinedMappingFont('pixelator', default_char='A', size=30, 
+                                                 mappings=font_mapping))
 
 
 def center_anchor(img: pyglet.image.TextureRegion):
     img.anchor_x = img.width // 2
     img.anchor_y = img.height // 2
-
-hex_image = pyglet.resource.image('dusk-hexagon-64x64.png')
-center_anchor(hex_image)
 
 hex_wall_image = pyglet.resource.image('hexagon_tile_walls.png')
 wall_textures = pyglet.image.ImageGrid(hex_wall_image, rows=1, columns=6, 
@@ -41,7 +43,7 @@ for texture in wall_textures:
 wall_names = ['UP', 'UP_RIGHT', 'DOWN_RIGHT', 'DOWN', 'DOWN_LEFT', 'UP_LEFT']
 tile_walls = {wall_names[i]: wall_textures[i] for i in range(len(wall_names))}
 
-ball_image = pyglet.resource.image('simple-ball-32x32.png')
+ball_image = pyglet.resource.image('simple_ball_32x32.png')
 center_anchor(ball_image)
 
 bop_laser_sound = pyglet.resource.media('bop_laser.wav', False)
@@ -69,3 +71,51 @@ for t in range(0, fade_time):
     
     point = midpoint_d.lerp(midpoint_e, alpha)
     fade_out[t] = round(point.y)
+    
+
+arrow_image = pyglet.resource.image('arrow_icons_16x16.png')
+arrow_textures = pyglet.image.ImageGrid(arrow_image, rows=1, columns=6,
+                                        item_height=16, item_width=16)
+keys = ['up_left', 'down_left', 'down', 'down_right', 'up_right', 'up']
+arrow_icons = {keys[i]: ImageElement(arrow_textures[i], 32, 28) for i in range(len(keys))}
+
+
+hex_icon = pyglet.resource.image('dusk-hexagon-64x64.png')
+center_anchor(hex_icon)
+
+
+class HUD:
+    def __init__(self, screen_width: int, screen_height: int, border: int, 
+                 batch: pyglet.graphics.Batch, group: pyglet.graphics.Group):
+        self.mono_font = pyglet.font.load('monogram', stretch=True)
+        
+        self.level_label = pyglet.text.Label('LEVEL 1', font_size=32, x=border, y=screen_height-border, 
+                                        anchor_y='top', font_name='monogram', 
+                                        batch=batch, group=group)
+        
+        player_controls = pyglet.text.document.FormattedDocument('CONTROLS')
+        self.player_controls_label = pyglet.text.DocumentLabel(player_controls)
+        firstline_width = self.player_controls_label.content_width*1.2//1
+        
+        player_controls.append_text('\n[Q]')
+        player_controls.insert_element(len(player_controls.text), arrow_icons['up_left'])
+        player_controls.append_text('\n[W]')
+        player_controls.insert_element(len(player_controls.text), arrow_icons['up'])
+        player_controls.append_text('\n[E]')
+        player_controls.insert_element(len(player_controls.text), arrow_icons['up_right'])
+        player_controls.append_text('\n[A]')
+        player_controls.insert_element(len(player_controls.text), arrow_icons['down_left'])
+        player_controls.append_text('\n[S]')
+        player_controls.insert_element(len(player_controls.text), arrow_icons['down'])
+        player_controls.append_text('\n[D]')
+        player_controls.insert_element(len(player_controls.text), arrow_icons['down_right'])
+        
+        self.player_controls_label = pyglet.text.DocumentLabel(document=player_controls,
+                                                               anchor_x='right', anchor_y='top',
+                                                               width=firstline_width,
+                                                               x=screen_width-border, y=screen_height-border, 
+                                                               multiline=True, batch=batch, group=group)
+        self.player_controls_label.font_name = 'monogram'
+        self.player_controls_label.font_size = 30
+        self.player_controls_label.color = (255, 255, 255, 255)
+        

@@ -10,6 +10,7 @@
     - "Where am I?"
     - "What am I doing here?"
     - "I guess all I can do is keep moving..."
+    - (*after some momentum is gained) "I know I can find a way."
 
 -- add waypoints and rooms around them
     -> RED lets you break through walls temporarily
