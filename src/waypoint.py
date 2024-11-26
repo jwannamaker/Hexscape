@@ -15,7 +15,7 @@ class Waypoint(abc.ABC):
         raise NotImplementedError
     
     @abc.abstractmethod
-    def color(self, shade=0) -> tuple[int]:
+    def color(self, shade=1) -> tuple[int]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -39,7 +39,7 @@ class RedWaypoint(Waypoint):
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(self.countdown, 0.1, self.duration())
     
-    def color(self, shade=0):
+    def color(self, shade=1):
         return palette['red'][shade]
     
     def ability_description(self):
@@ -57,7 +57,7 @@ class OrangeWaypoint(Waypoint):
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(self.countdown, 0.1, self.duration())
         
-    def color(self, shade=0):
+    def color(self, shade=1):
         return palette['orange'][shade]
     
     def ability_description(self):
@@ -75,7 +75,7 @@ class YellowWaypoint(Waypoint):
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(self.countdown, 0.1, self.duration())
         
-    def color(self, shade=0):
+    def color(self, shade=1):
         return palette['yellow'][shade]
     
     def ability_description(self):
@@ -93,7 +93,7 @@ class PurpleWaypoint(Waypoint):
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(self.countdown, 0.1, self.duration())
         
-    def color(self, shade=0):
+    def color(self, shade=1):
         return palette['purple'][shade]
         
     def ability_description(self):
@@ -111,7 +111,7 @@ class GreenWaypoint(Waypoint):
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(self.countdown, 0.1, self.duration())
         
-    def color(self, shade=0):
+    def color(self, shade=1):
         return palette['green'][shade]
     
     def ability_description(self):
@@ -129,7 +129,7 @@ class BlueWaypoint(Waypoint):
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(self.countdown, 0.1, self.duration())
         
-    def color(self, shade=0):
+    def color(self, shade=1):
         return palette['blue'][shade]
     
     def ability_description(self):

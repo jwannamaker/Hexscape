@@ -2,6 +2,7 @@ import string
 import json
 
 import pyglet
+from pyglet.font.user import UserDefinedMappingFont
 import numpy as np
 from PIL import ImageColor
 
@@ -20,8 +21,10 @@ for key in palette:
     palette[key] = converted_values
 
 keys = [*string.ascii_uppercase, *string.digits]
-values = [pyglet.resource.image(f'{char}.png') for char in keys]
-font = {k: v for k, v in zip(keys, values)}
+values = [pyglet.resource.image(f'{char}.png').get_image_data() for char in keys]
+font_mapping = {k: v for k, v in zip(keys, values)}
+pyglet.font.add_user_font(UserDefinedMappingFont('pixelator', default_char='A', size=30, mappings=font_mapping))
+
 
 def center_anchor(img: pyglet.image.TextureRegion):
     img.anchor_x = img.width // 2
@@ -66,4 +69,3 @@ for t in range(0, fade_time):
     
     point = midpoint_d.lerp(midpoint_e, alpha)
     fade_out[t] = round(point.y)
-

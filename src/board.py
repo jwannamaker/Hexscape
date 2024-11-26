@@ -73,6 +73,7 @@ class HexBoard:
             self.player.collect_waypoint(potential_waypoint)
             pyglet.event.EventDispatcher.dispatch_event(self._window,
                                                         'on_waypoint_discovered',
+                                                        potential_waypoint.color(),
                                                         potential_waypoint.ability_description())
         
         next_position = hex_util.center(new_tile, self._radius, self._origin)

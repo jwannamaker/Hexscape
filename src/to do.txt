@@ -6,7 +6,7 @@
     -> the big picture should be that you can't go back. you can't know
     if which way youre heading is the right way or not, but you have to 
     keep moving.
-    -> emphasis on memory, sounds, attention to details
+    - emphasis on memory, sounds, attention to details
     - "Where am I?"
     - "What am I doing here?"
     - "I guess all I can do is keep moving..."

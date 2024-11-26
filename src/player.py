@@ -14,21 +14,20 @@ class Player(pyglet.sprite.Sprite):
         self.next_position = deque([])
         self._movable = True
         
-        self.waypoint_collection = {}
+        self.waypoint_collection : dict[str, Waypoint] = {}
         self.timers = deque(maxlen=1)
     
     def movable(self):
         return self._movable
     
     def move(self, dt):
-        """ Address the way a player moves according to waypoints activated. """
         self.current_position = pyglet.math.Vec2(self.x, self.y)
         destination = self.current_position if len(self.next_position) == 0 else self.next_position[0]
         distance = self.current_position.distance(destination)
         if distance > 1:
             self._movable = False
-            self.x += ((destination[0] - self.x) / distance) * dt * 100
-            self.y += ((destination[1] - self.y) / distance) * dt * 100
+            self.x += ((destination[0] - self.x) / distance) * dt * 150
+            self.y += ((destination[1] - self.y) / distance) * dt * 150
         else:
             self._movable = True
             if len(self.next_position) > 0:
@@ -46,9 +45,10 @@ class Player(pyglet.sprite.Sprite):
     def activate_waypoint(self, color: str):
         if color in self.waypoint_collection and color not in self.timers:
             self.waypoint_collection[color].activate()
-            if isinstance(self.waypoint_collection[color], RedWaypoint):
-                """ Toggle something that changes the way the player moves """
-                pass
             
     def actionable(self):
-        return len(self.waypoint_collection)
+        actionable = False
+        for color in self.waypoint_collection:
+            if not self.waypoint_collection[color].activated:
+                actionable = True
+        return actionable

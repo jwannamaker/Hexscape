@@ -8,9 +8,8 @@ from pyglet.window import key, mouse
 
 from board import HexBoard
 from cell import HexCell
-from font import Font
 from player import Player
-from resources import palette, hex_image, ball_image, intro, full_track
+from resources import palette, hex_image, ball_image, intro
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -39,10 +38,6 @@ audio_player.loop = True
 audio_player.queue(intro)
 
 
-font_manager = Font(32, 32, main_window.width, main_window.height, background_batch, font_group)
-font_manager.write('Level 1', 0, main_window.height-64)
-
-
 player = Player(img=ball_image, 
                 x=main_window.width//2, 
                 y=main_window.height//2,
@@ -51,7 +46,18 @@ player_movement_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
 player_action_controls = [key.R]
 
 
-hud_label = pyglet.text.Label('', 'Mono', 24, x=0, y=20, batch=main_batch, group=font_group)
+pyglet.font.load('monogram')
+level_label = pyglet.text.Label('LEVEL 1', font_size=40, x=10, y=main_window.height-10, 
+                                anchor_y='top', font_name='monogram', 
+                                batch=main_batch, group=font_group)
+player_controls = 'CONTROLS\nQ: UP_LEFT\nW: UP\nE: UP_RIGHT\nA: DOWN_LEFT\nS: DOWN\nD: DOWN_RIGHT'
+player_controls_label = pyglet.text.Label(text=player_controls, font_size=40, 
+                                          x=main_window.width-10, y=main_window.height-10, 
+                                          anchor_x='right', anchor_y='top', width=480, 
+                                          multiline=True, align='right', font_name='monogram', 
+                                          batch=main_batch, group=font_group)
+hud_label = pyglet.text.Label('', font_size=40, x=10, y=10, font_name='monogram', 
+                              batch=main_batch, group=font_group)
 
 
 board = HexBoard(radius=64, 
@@ -109,4 +115,5 @@ def on_draw():
     
 if __name__ == '__main__':
     print(main_window.event_types)
+    print(f'user font loaded: {pyglet.font.have_font('pixelator')}')
     pyglet.app.run()

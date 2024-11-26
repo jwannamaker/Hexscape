@@ -43,7 +43,6 @@ class HexCell:
             self.walls[neighbor.coordinate()] = False
 
     def neighbors(self):
-        """ Returns the list of all neighbors that don't have a wall between them. """
         neighbors = []
         for neighbor, wall in list(self.walls.items()):
             if not wall:
