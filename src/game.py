@@ -97,6 +97,7 @@ def on_key_press(symbol, modifiers):
 def on_waypoint_discovered(color: tuple[int], ability_description: str):
     hud_label.color = color
     hud_label.text = ability_description.upper()
+    print(f'waypoint collection: \n{player.waypoint_collection}')
 
 @main_window.event
 def on_draw():

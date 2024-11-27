@@ -70,7 +70,7 @@ class HexBoard:
         self._tiles[self.player_pos].highlight()
         
         potential_waypoint = self._tiles[self.player_pos].waypoint()
-        if isinstance(potential_waypoint, Waypoint):
+        if isinstance(potential_waypoint, Waypoint) and str(potential_waypoint) not in self.player.waypoint_collection:
             self.player.collect_waypoint(potential_waypoint)
             pyglet.event.EventDispatcher.dispatch_event(self._window,
                                                         'on_waypoint_discovered',

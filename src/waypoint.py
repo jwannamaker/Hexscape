@@ -28,6 +28,12 @@ class Waypoint(abc.ABC):
 
 
 class RedWaypoint(Waypoint):
+    def __str__(self) -> str:
+        return 'red'
+    
+    def __repr__(self) -> str:
+        return 'red_waypoint'
+    
     def __init__(self):
         super().__init__()
     
@@ -50,6 +56,12 @@ class RedWaypoint(Waypoint):
     
     
 class OrangeWaypoint(Waypoint):
+    def __str__(self) -> str:
+        return 'orange'
+    
+    def __repr__(self) -> str:
+        return 'orange_waypoint'
+    
     def countdown(self, dt: float):
         return self.duration() - dt
     
@@ -68,6 +80,12 @@ class OrangeWaypoint(Waypoint):
 
 
 class YellowWaypoint(Waypoint):
+    def __str__(self) -> str:
+        return 'yellow'
+    
+    def __repr__(self) -> str:
+        return 'yellow_waypoint'
+    
     def countdown(self, dt: float):
         return self.duration() - dt
     
@@ -86,6 +104,12 @@ class YellowWaypoint(Waypoint):
 
 
 class PurpleWaypoint(Waypoint):
+    def __str__(self) -> str:
+        return 'purple'
+    
+    def __repr__(self) -> str:
+        return 'purple_waypoint'
+    
     def countdown(self, dt: float):
         return self.duration() - dt
     
@@ -104,6 +128,12 @@ class PurpleWaypoint(Waypoint):
 
 
 class GreenWaypoint(Waypoint):
+    def __str__(self) -> str:
+        return 'green'
+    
+    def __repr__(self) -> str:
+        return 'green_waypoint'
+    
     def countdown(self, dt: float):
         return self.duration() - dt
     
@@ -122,6 +152,12 @@ class GreenWaypoint(Waypoint):
     
     
 class BlueWaypoint(Waypoint):
+    def __str__(self) -> str:
+        return 'blue'
+    
+    def __repr__(self) -> str:
+        return 'blue_waypoint'
+    
     def countdown(self, dt: float):
         return self.duration() - dt
     

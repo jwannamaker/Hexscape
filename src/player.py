@@ -15,7 +15,6 @@ class Player(pyglet.sprite.Sprite):
         self._movable = True
         
         self.waypoint_collection : dict[str, Waypoint] = {}
-        self.timers = deque(maxlen=1)
     
     def movable(self):
         return self._movable
@@ -40,10 +39,10 @@ class Player(pyglet.sprite.Sprite):
             self.next_position.append(pyglet.math.Vec2(*screen_position))
     
     def collect_waypoint(self, waypoint: Waypoint):
-        self.waypoint_collection[waypoint.color()] = waypoint
+        self.waypoint_collection[str(waypoint)] = waypoint
     
     def activate_waypoint(self, color: str):
-        if color in self.waypoint_collection and color not in self.timers:
+        if color in self.waypoint_collection and not self.waypoint_collection[color].activated:
             self.waypoint_collection[color].activate()
             
     def actionable(self):
