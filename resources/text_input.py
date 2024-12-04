@@ -53,8 +53,6 @@ class Window(pyglet.window.Window):
 
     def on_resize(self, width, height):
         super(Window, self).on_resize(width, height)
-        for widget in self.widgets:
-            widget.width = width - 110
 
     def on_draw(self):
         pyglet.gl.glClearColor(1, 1, 1, 1)

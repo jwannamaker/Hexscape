@@ -52,6 +52,11 @@ class HexCell:
     def place_waypoint(self, waypoint: Waypoint):
         self._waypoint = waypoint
     
+    def remove_waypoint(self):
+        if isinstance(self._waypoint, Waypoint):
+            self._waypoint = None
+            self.background.color = palette['black'][0]
+    
     def waypoint(self):
         if isinstance(self._waypoint, Waypoint):
             return self._waypoint

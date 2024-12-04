@@ -9,7 +9,8 @@ from pyglet.window import key, mouse
 from board import HexBoard
 from cell import HexCell
 from player import Player
-from resources import palette, hex_icon, ball_image, intro, HUD
+from resources import palette, hex_icon, ball_image, intro, fade_out
+from display import WaypointDisplay, ControlDisplay
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -45,10 +46,16 @@ player = Player(img=ball_image,
 player_movement_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
 player_action_controls = [key.R]
 
-
-hud = HUD(main_window.width, main_window.height, 10, main_batch, font_group)
+def fade_text(dt: float, label: pyglet.text.Label):
+    label.color = (label.color[0], label.color[1], label.color[2], label.color[3]-8)
+    
+# hud = ControlDisplay(main_window.width, main_window.height, 10, main_batch, font_group)
 hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', 
                               batch=main_batch, group=font_group)
+level_label = pyglet.text.Label('LEVEL 1', font_size=48, x=10, y=main_window.height-10, 
+                                anchor_y='top', font_name='monogram', 
+                                batch=main_batch, group=font_group)
+waypoint_label = WaypointDisplay(main_batch)
 
 
 board = HexBoard(radius=64, 
@@ -88,16 +95,12 @@ def on_key_press(symbol, modifiers):
         if symbol == key.D:
             board.move_player('DOWN_RIGHT')
         clock.schedule(player.move)
-    
-    if symbol in player_action_controls and player.actionable():
-        if symbol == key.R:
-            player.activate_waypoint('red')
 
 @main_window.event
 def on_waypoint_discovered(color: tuple[int], ability_description: str):
     hud_label.color = color
     hud_label.text = ability_description.upper()
-    print(f'waypoint collection: \n{player.waypoint_collection}')
+    clock.schedule_interval_for_duration(fade_text, 0.5, 20.0, label=hud_label)
 
 @main_window.event
 def on_draw():

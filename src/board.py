@@ -45,7 +45,7 @@ class HexBoard:
     def start_level(self, level: int):
         if level == 1:
             self.generate_maze(self._tiles[self.player_pos])
-            self.place_waypoints([1, 2, 3, 4, 1, 2], 
+            self.place_waypoints([2, 2, 2, 3, 3, 3], 
                                  [RedWaypoint(), BlueWaypoint(), GreenWaypoint(), PurpleWaypoint(), YellowWaypoint(), OrangeWaypoint()])
             
     def boundary_check(self, pre_move: Hex, direction: str):
@@ -76,6 +76,7 @@ class HexBoard:
                                                         'on_waypoint_discovered',
                                                         potential_waypoint.color(),
                                                         potential_waypoint.ability_description())
+            self._tiles[self.player_pos].remove_waypoint()
         
         next_position = hex_util.center(new_tile, self._radius, self._origin)
         self.player.add_next_position(next_position)

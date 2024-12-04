@@ -1,5 +1,7 @@
+
 - save the tilemap in a .json
 
+Genera
 -- ball glows stronger and stronger the closer you are to the 'waypoints'
 
 -- add a dialog to the game

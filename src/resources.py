@@ -6,9 +6,8 @@ from PIL import ImageColor
 import pyglet.image
 import pyglet
 from pyglet.font.user import UserDefinedMappingFont
-from pyglet.text.document import InlineElement
 from pyglet.text.formats.structured import ImageElement
-from pyglet.text.layout import TextLayout
+
 
 pyglet.resource.path = ['../resources', 
                         '../resources/audio', 
@@ -52,7 +51,7 @@ intro = pyglet.resource.media('intro.mp3', False)
 full_track = pyglet.resource.media('Piano_bipFullTrack.wav', True)
 
 # Calculate color fade in/out values
-fade_time = 12000
+fade_time = 1200 
 
 control_pt_1 = pyglet.math.Vec2(0, 255)
 control_pt_2 = pyglet.math.Vec2(400, 70)
@@ -84,38 +83,5 @@ hex_icon = pyglet.resource.image('dusk-hexagon-64x64.png')
 center_anchor(hex_icon)
 
 
-class HUD:
-    def __init__(self, screen_width: int, screen_height: int, border: int, 
-                 batch: pyglet.graphics.Batch, group: pyglet.graphics.Group):
-        self.mono_font = pyglet.font.load('monogram', stretch=True)
-        
-        self.level_label = pyglet.text.Label('LEVEL 1', font_size=32, x=border, y=screen_height-border, 
-                                        anchor_y='top', font_name='monogram', 
-                                        batch=batch, group=group)
-        
-        player_controls = pyglet.text.document.FormattedDocument('CONTROLS')
-        self.player_controls_label = pyglet.text.DocumentLabel(player_controls)
-        firstline_width = self.player_controls_label.content_width*1.2//1
-        
-        player_controls.append_text('\n[Q]')
-        player_controls.insert_element(len(player_controls.text), arrow_icons['up_left'])
-        player_controls.append_text('\n[W]')
-        player_controls.insert_element(len(player_controls.text), arrow_icons['up'])
-        player_controls.append_text('\n[E]')
-        player_controls.insert_element(len(player_controls.text), arrow_icons['up_right'])
-        player_controls.append_text('\n[A]')
-        player_controls.insert_element(len(player_controls.text), arrow_icons['down_left'])
-        player_controls.append_text('\n[S]')
-        player_controls.insert_element(len(player_controls.text), arrow_icons['down'])
-        player_controls.append_text('\n[D]')
-        player_controls.insert_element(len(player_controls.text), arrow_icons['down_right'])
-        
-        self.player_controls_label = pyglet.text.DocumentLabel(document=player_controls,
-                                                               anchor_x='right', anchor_y='top',
-                                                               width=firstline_width,
-                                                               x=screen_width-border, y=screen_height-border, 
-                                                               multiline=True, batch=batch, group=group)
-        self.player_controls_label.font_name = 'monogram'
-        self.player_controls_label.font_size = 30
-        self.player_controls_label.color = (255, 255, 255, 255)
+empty_hud_waypoint = pyglet.resource.image('empty_waypoint_hud_icon_32x32.png')
         
