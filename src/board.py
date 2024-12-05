@@ -8,7 +8,7 @@ from cell import HexCell
 from hex import Hex
 from hex import HexOrientation as hex_util
 from hex import generate_square_grid
-from waypoint import Waypoint, RedWaypoint, GreenWaypoint, BlueWaypoint, YellowWaypoint, PurpleWaypoint, OrangeWaypoint
+from waypoint import WaypointType, Waypoint
 from player import Player
 from resources import click_sound, fade_out
 
@@ -41,12 +41,28 @@ class HexBoard:
 
     def __contains__(self, key: Hex):
         return key in self._tiles
-            
+    
+    def place_waypoint(self, type: WaypointType):
+        pass
+    
+    def place_waypoints(self, player_distances: list[int], waypoints: list[Waypoint]):
+        for dist, waypoint in zip(player_distances, waypoints):
+            potential_tiles = hex_util.search_nearby(self.player_pos, random.randint(dist, dist+1))
+            self._tiles[random.choice(potential_tiles)].place_waypoint(waypoint)
+    
     def start_level(self, level: int):
+        waypoints = [Waypoint(type) for type in WaypointType]
         if level == 1:
+            proximity_map = [random.randrange(1, self._radius) for _ in waypoints]
+            
             self.generate_maze(self._tiles[self.player_pos])
             self.place_waypoints([2, 2, 2, 3, 3, 3], 
-                                 [RedWaypoint(), BlueWaypoint(), GreenWaypoint(), PurpleWaypoint(), YellowWaypoint(), OrangeWaypoint()])
+                                 [WaypointType.RED,
+                                  WaypointType.GREEN,
+                                  WaypointType.BLUE,
+                                  WaypointType.PURPLE,
+                                  WaypointType.YELLOW,
+                                  WaypointType.ORANGE])
             
     def boundary_check(self, pre_move: Hex, direction: str):
         post_move = hex_util.neighbor(pre_move, direction)
@@ -81,11 +97,6 @@ class HexBoard:
         next_position = hex_util.center(new_tile, self._radius, self._origin)
         self.player.add_next_position(next_position)
         self._player_trail[new_tile] = 0
-
-    def place_waypoints(self, player_distances: list[int], waypoints: list[Waypoint]):
-        for dist, waypoint in zip(player_distances, waypoints):
-            potential_tiles = hex_util.search_nearby(self.player_pos, random.randint(dist, dist+1))
-            self._tiles[random.choice(potential_tiles)].place_waypoint(waypoint)
     
     def remove_wall(self, cell_a: HexCell, cell_b: HexCell):
         if cell_a.coordinate() in cell_b.walls:
