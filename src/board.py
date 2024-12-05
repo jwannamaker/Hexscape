@@ -45,19 +45,13 @@ class HexBoard:
     def place_waypoint(self, type: WaypointType):
         pass
     
-    def place_waypoints(self, player_distances: list[int], waypoints: list[Waypoint]):
-        for dist, waypoint in zip(player_distances, waypoints):
-            potential_tiles = hex_util.search_nearby(self.player_pos, random.randint(dist, dist+1))
-            self._tiles[random.choice(potential_tiles)].place_waypoint(waypoint)
-    
     def start_level(self, level: int):
         waypoints = [Waypoint(type) for type in WaypointType]
         if level == 1:
             proximity_map = [random.randrange(1, self._radius) for _ in waypoints]
             
             self.generate_maze(self._tiles[self.player_pos])
-            self.place_waypoints([2, 2, 2, 3, 3, 3], 
-                                 [WaypointType.RED,
+            self.place_waypoints([WaypointType.RED,
                                   WaypointType.GREEN,
                                   WaypointType.BLUE,
                                   WaypointType.PURPLE,
