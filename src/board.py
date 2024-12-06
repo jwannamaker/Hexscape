@@ -42,21 +42,24 @@ class HexBoard:
     def __contains__(self, key: Hex):
         return key in self._tiles
     
-    def place_waypoint(self, type: WaypointType):
-        pass
-    
     def start_level(self, level: int):
-        waypoints = [Waypoint(type) for type in WaypointType]
-        if level == 1:
-            proximity_map = [random.randrange(1, self._radius) for _ in waypoints]
-            
-            self.generate_maze(self._tiles[self.player_pos])
-            self.place_waypoints([WaypointType.RED,
-                                  WaypointType.GREEN,
-                                  WaypointType.BLUE,
-                                  WaypointType.PURPLE,
-                                  WaypointType.YELLOW,
-                                  WaypointType.ORANGE])
+        # randomly determine which waypoints are placed this level
+        potential_waypoints = [Waypoint(type) for type in WaypointType]
+        waypoints = random.choices(Waypoint)
+        
+        # place waypoints
+        proximity_map = [random.randrange(1, self._radius) for _ in waypoints]
+        for waypoint in waypoints:
+            pass
+        
+        # generate maze to make each waypoint a destination
+        self.generate_maze(self._tiles[self.player_pos])
+        self.place_waypoints([WaypointType.RED,
+                                WaypointType.GREEN,
+                                WaypointType.BLUE,
+                                WaypointType.PURPLE,
+                                WaypointType.YELLOW,
+                                WaypointType.ORANGE])
             
     def boundary_check(self, pre_move: Hex, direction: str):
         post_move = hex_util.neighbor(pre_move, direction)
@@ -75,8 +78,7 @@ class HexBoard:
 
     def move_player(self, direction: str):
         click_sound.play()
-        new_tile = self.boundary_check(self.player_pos, direction)
-        self.player_pos = new_tile
+        self.player_pos = self.boundary_check(self.player_pos, direction)
         self._tiles[self.player_pos].highlight()
         
         potential_waypoint = self._tiles[self.player_pos].waypoint()
@@ -88,9 +90,9 @@ class HexBoard:
                                                         potential_waypoint.ability_description())
             self._tiles[self.player_pos].remove_waypoint()
         
-        next_position = hex_util.center(new_tile, self._radius, self._origin)
-        self.player.add_next_position(next_position)
-        self._player_trail[new_tile] = 0
+        next_position = hex_util.center(self.player_pos, self._radius, self._origin)
+        self.player.add_next_position(next_position) # smooths player movement
+        self._player_trail[self.player_pos] = 0
     
     def remove_wall(self, cell_a: HexCell, cell_b: HexCell):
         if cell_a.coordinate() in cell_b.walls:
