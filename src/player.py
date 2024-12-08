@@ -3,7 +3,7 @@ from collections import deque
 import pyglet
 import numpy as np
 
-from waypoint import Waypoint, RedWaypoint, OrangeWaypoint, YellowWaypoint, PurpleWaypoint, GreenWaypoint, BlueWaypoint
+from waypoint import Waypoint
 
 
 class Player(pyglet.sprite.Sprite):

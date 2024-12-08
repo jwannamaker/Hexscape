@@ -45,21 +45,15 @@ class HexBoard:
     def start_level(self, level: int):
         # randomly determine which waypoints are placed this level
         potential_waypoints = [Waypoint(type) for type in WaypointType]
-        waypoints = random.choices(Waypoint)
-        
-        # place waypoints
-        proximity_map = [random.randrange(1, self._radius) for _ in waypoints]
-        for waypoint in waypoints:
-            pass
-        
-        # generate maze to make each waypoint a destination
-        self.generate_maze(self._tiles[self.player_pos])
-        self.place_waypoints([WaypointType.RED,
-                                WaypointType.GREEN,
-                                WaypointType.BLUE,
-                                WaypointType.PURPLE,
-                                WaypointType.YELLOW,
-                                WaypointType.ORANGE])
+        waypoints = random.choices(potential_waypoints, weights=[w.data['rarity'] for w in potential_waypoints], 
+                                   k=random.randint(1, level))
+        # self.place_waypoints([WaypointType.RED,
+        #                         WaypointType.GREEN,
+        #                         WaypointType.BLUE,
+        #                         WaypointType.PURPLE,
+        #                         WaypointType.YELLOW,
+        #                         WaypointType.ORANGE])
+        self.generate_maze_ver2(self._tiles[self.player_pos])
             
     def boundary_check(self, pre_move: Hex, direction: str):
         post_move = hex_util.neighbor(pre_move, direction)
@@ -100,11 +94,17 @@ class HexBoard:
         if cell_b.coordinate() in cell_a.walls:
             cell_a.remove_wall(cell_b)
     
+    def add_wall(self, cell_a: HexCell, cell_b: HexCell):
+        if cell_a.coordinate() in cell_b.walls:
+            cell_b.add_wall(cell_a)
+        if cell_b.coordinate() in cell_a.walls:
+            cell_a.add_wall(cell_b)
+    
     def unvisited_neighbors(self, tile: HexCell):
         neighbors = hex_util.neighbors(tile.coordinate())
         return [self._tiles[neighbor] for neighbor in neighbors if neighbor in self._tiles and self._tiles[neighbor].unvisited()]
     
-    def generate_maze(self, current_tile: HexCell):
+    def generate_maze_ver1(self, current_tile: HexCell):
         if current_tile.unvisited():
             current_tile.visit()
         
@@ -117,6 +117,27 @@ class HexBoard:
                 
                 if neighbor_tile.unvisited():
                     self.remove_wall(current_tile, neighbor_tile)
-                    self.generate_maze(neighbor_tile)
-            
+                    self.generate_maze_ver1(neighbor_tile)
+                    
+    def generate_maze_ver2(self, current_tile: HexCell):
+        self.generate_maze_ver1(current_tile)
+        self.apply_sparseness(probability=100, percent_fill=75)
+    
+    def tile_count(self):
+        return len(self._tiles.values())
+    
+    def fill(self):
+        fill = 100
+        percent = self.tile_count() // 100
+        for tile in self._tiles:
+            if self._tiles[tile].blocked_off():
+                fill -= percent
+        return fill
+
+    def apply_sparseness(self, *, probability: int, percent_fill: int):
         
+        while self.fill() < percent_fill:
+            for tile, cell_a in self._tiles.items():
+                if len(list(filter(None, tile.walls))) == 5:
+                    if random.randint(1, 100) <= probability:
+                        self.add_wall(tile, tile)

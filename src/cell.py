@@ -38,6 +38,18 @@ class HexCell:
     def unvisited(self):
         return not self.visited
 
+    def add_wall(self, neighbor: 'HexCell'):
+        if self.walls[neighbor.coordinate()]:
+            self.walls[neighbor.coordinate()] = False
+
+    def blocked_off(self):
+        return False if True in self.walls else False
+    
+    # def block_off(self):
+    #     for neighbor in self.walls:
+    #         if neighbor:
+    #             self.walls[neighbor] = False
+    
     def remove_wall(self, neighbor: 'HexCell'):
         if self.walls[neighbor.coordinate()]:
             self.walls[neighbor.coordinate()] = False
