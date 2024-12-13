@@ -1,41 +1,43 @@
-# Hexscape
+# HEXscape
 
 ## Story/Manifesto
 
-- add a dialog to the game
+- The player is not given very much to work off of, and must discover why they are tasked with this mission.
+- Some lines in the dialogue include:
   - "Where am I?"
+  - "What is this?"
   - "What am I doing here?"
   - "I guess all I can do is keep moving..."
-  - (*after some momentum is gained) "I know I can find a way."
-- emphasis on memory, sounds, attention to details. make it impossible to win just by button mashing.
-- the big picture should be gaining confidence, and persevering through failure/the unknown. embracing it even, as the cornerstone of progress and growth.
-- the player should understand that you can't go back on decisions you've made in the past. it's nearly impossible to know if which way you're headed is the right way or not, but you have to keep moving. keep trying.
+  - (*After some momentum is gained, perhaps after restarting from level 1.) "I know I can find a way."
+- Emphasis on memory, sounds, attention to details. It's impossible to win just by button mashing.
+- The big picture is to gain confidence, and persevere through failure/the unknown. The player will have to embrace it even, as the cornerstone of their progress and growth.
+- The player will come to understand that they can't go back on decisions they've made in the past. Although it's nearly impossible to know if they're headed the right way or not, they must keep moving. Keep trying.
 
 ## Aesthetics
 
-- every asset either my own hand drawing via aesprite or a primative shape via pyglet
-- the HUD includes:
-  - a move counter in the top right corner
-  - the level in the top left corner
-  - the player's currently collected waypoints along the left edge of the screen
-  - a menu/settings/pause button either in the top right corner or the bottom right corner
+- Every asset is either hand draw via Aesprite or a primative shape managed via Pyglet.
+- The HUD includes:
+  - Move counter in the top right corner.
+  - Current level in the top left corner.
+  - Collected waypoints along the left edge of the screen.
+  - Pause button in the bottom right corner.
 
 ## Visual FX
 
-- parallax effect to center the 'camera' on the ball
-- add some 'bumping' animation for running into a wall
-- ball glows stronger and stronger the closer you are to the 'waypoints'
+- Isometric perspective achieved by a custom projection matrix configuration via Pyglet module `graphics`.
+- Parallax effect to center the view on the player.
+- Add some 'bumping' animation for running into a wall.
+- Ball glows stronger and stronger the closer you are to exiting the level.
 
 ## Audio FX
 
-- add excitement to the music as the player progresses/gains more confidence
-  - add a layer to the music for each waypoint discovered
+- Add excitement to the music as the player progresses/gains more confidence, such as reaching a certain level or collecting a certain color waypoint. Each color sounds a unique way.
   - needs a good kick drum line
   - snare
   - hihat
   - guitar
 
-## Gameplay Mechanics
+## Gameplay Mechanics/Implementation Details
 
 ### Map/Procedural Maze Generation
 

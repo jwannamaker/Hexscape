@@ -7,8 +7,8 @@ from pyglet import gl
 from pyglet.window import key, mouse
 
 from board import HexBoard
-from cell import HexCell
 from player import Player
+from screen_fx import LevelStartScreen
 from resources import palette, hex_icon, ball_image, intro, fade_out
 from display import WaypointDisplay, ControlDisplay
 
@@ -21,11 +21,13 @@ main_window.set_icon(hex_icon)
 main_window.set_caption('hexscape')
 main_window.register_event_type('on_waypoint_discovered')
 main_window.register_event_type('on_point_scored')
-main_window.register_event_type('on_next_level')
+main_window.register_event_type('on_level_start')
 main_window.register_event_type('on_game_over')
 main_window.register_event_type('on_menu')
 
 
+game_pause = False
+pause_batch = pyglet.graphics.Batch()
 background_batch = pyglet.graphics.Batch()
 font_group = pyglet.graphics.Group(order=3)
 main_batch = pyglet.graphics.Batch()
@@ -49,7 +51,6 @@ player_action_controls = [key.R]
 def fade_text(dt: float, label: pyglet.text.Label):
     label.color = (label.color[0], label.color[1], label.color[2], label.color[3]-8)
     
-# hud = ControlDisplay(main_window.width, main_window.height, 10, main_batch, font_group)
 hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', 
                               batch=main_batch, group=font_group)
 level_label = pyglet.text.Label('LEVEL 1', font_size=48, x=10, y=main_window.height-10, 
@@ -70,6 +71,20 @@ board = HexBoard(radius=64,
 clock = pyglet.clock.get_default()
 clock.schedule_interval_soft(board.fade_tile, 0.005)
 
+
+@main_window.event
+def on_show():
+    pyglet.event.EventDispatcher.dispatch_event(main_window, 'on_level_start', 1)
+    
+@main_window.event
+def on_level_start(level: int):
+    global game_pause 
+    game_pause = True
+    level_start_screen = LevelStartScreen(background_color=palette['black'][0],
+                                          level=level,
+                                          screen_width=main_window.width,
+                                          screen_height=main_window.height,
+                                          batch=pause_batch)
 
 @main_window.event
 def on_key_press(symbol, modifiers):
@@ -105,8 +120,12 @@ def on_waypoint_discovered(color: tuple[int], ability_description: str):
 @main_window.event
 def on_draw():
     main_window.clear()
-    background_batch.draw()
-    main_batch.draw()
+    if not game_pause:
+        background_batch.draw()
+        main_batch.draw()
+    else:
+        print('game is paused')
+        pause_batch.draw()
     
 if __name__ == '__main__':
     print(main_window.event_types)
