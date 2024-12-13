@@ -7,16 +7,18 @@
   - "What am I doing here?"
   - "I guess all I can do is keep moving..."
   - (*after some momentum is gained) "I know I can find a way."
-- emphasis on memory, sounds, attention to details
-- the big picture should be gaining confidence, and persevering through failure/the unknown
-- you can't go back. you can't know if which way youre heading is the right way or not, but you have to keep moving.
+- emphasis on memory, sounds, attention to details. make it impossible to win just by button mashing.
+- the big picture should be gaining confidence, and persevering through failure/the unknown. embracing it even, as the cornerstone of progress and growth.
+- the player should understand that you can't go back on decisions you've made in the past. it's nearly impossible to know if which way you're headed is the right way or not, but you have to keep moving. keep trying.
 
-## Map
+## Aesthetics
 
-- save the tilemap in a .json
-- generate in an irregular shape
-- make holes, rooms, forks, loops
-- generate with a more meaningful goal/exit point
+- every asset either my own hand drawing via aesprite or a primative shape via pyglet
+- the HUD includes:
+  - a move counter in the top right corner
+  - the level in the top left corner
+  - the player's currently collected waypoints along the left edge of the screen
+  - a menu/settings/pause button either in the top right corner or the bottom right corner
 
 ## Visual FX
 
@@ -34,6 +36,16 @@
   - guitar
 
 ## Gameplay Mechanics
+
+### Map/Procedural Maze Generation
+
+- save the tilemap in a map.json?
+- parameters for the procedurally generated maze
+  - irregular shape
+  - loops
+  - rooms?
+  - 'destination' for each waypoint
+  - meaningful goal/exit point
 
 ### Waypoints
 

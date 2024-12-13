@@ -138,6 +138,6 @@ class HexBoard:
         
         while self.fill() < percent_fill:
             for tile, cell_a in self._tiles.items():
-                if len(list(filter(None, tile.walls))) == 5:
+                if len(list(filter(None, cell_a.walls))) == 5:
                     if random.randint(1, 100) <= probability:
                         self.add_wall(tile, tile)
