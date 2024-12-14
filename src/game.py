@@ -14,120 +14,97 @@ from display import WaypointDisplay, ControlDisplay, LevelStartScreen
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
-main_window = pyglet.window.Window()
-main_window.set_fullscreen(True)
-main_window.set_icon(hex_icon)
-main_window.set_caption('hexscape')
-main_window.register_event_type('on_level_start')
-main_window.register_event_type('on_waypoint_discovered')
-main_window.register_event_type('on_point_scored')
-main_window.register_event_type('on_menu')
-main_window.register_event_type('on_game_over')
+
+class Hexscape(pyglet.window.Window):
+    def __init__(self):
+        super().__init__()
+        self.set_fullscreen(True)
+        self.set_icon(hex_icon)
+        self.set_caption('hexscape')
+        self.register_event_type('on_level_start')
+        self.register_event_type('on_waypoint_discovered')
+        self.register_event_type('on_point_scored')
+        self.register_event_type('on_menu')
+        self.register_event_type('on_game_over')
+            
+        self.pause = False
+        self.pause_batch = pyglet.graphics.Batch()
+        self.background_batch = pyglet.graphics.Batch()
+        self.font_group = pyglet.graphics.Group(order=3)
+        self.main_batch = pyglet.graphics.Batch()
+        self.background_color = pyglet.shapes.Rectangle(0, 0, self.width, self.height, color=palette['black'][0], batch=self.background_batch)
 
 
-game_pause = False
-pause_batch = pyglet.graphics.Batch()
-background_batch = pyglet.graphics.Batch()
-font_group = pyglet.graphics.Group(order=3)
-main_batch = pyglet.graphics.Batch()
-background_color = pyglet.shapes.Rectangle(0, 0, main_window.width, main_window.height,
-                                           color=palette['black'][0], batch=background_batch)
+        self.audio_player = pyglet.media.Player()
+        self.audio_player.volume = 0.1
+        self.audio_player.loop = True
+        self.audio_player.queue(intro)
 
 
-audio_player = pyglet.media.Player()
-audio_player.volume = 0.1
-audio_player.loop = True
-audio_player.queue(intro)
+        self.player = Player(img=ball_image, x=self.width//2, y=self.height//2, batch=self.main_batch)
+        self.player_movement_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
+        self.player_action_controls = [key.R]
 
-
-player = Player(img=ball_image, 
-                x=main_window.width//2, 
-                y=main_window.height//2,
-                batch=main_batch)
-player_movement_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
-player_action_controls = [key.R]
-
-def fade_text(dt: float, label: pyglet.text.Label):
-    label.color = (label.color[0], label.color[1], label.color[2], label.color[3]-8)
-    
-hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', 
-                              batch=main_batch, group=font_group)
-level_label = pyglet.text.Label('LEVEL 1', font_size=48, x=10, y=main_window.height-10, 
-                                anchor_y='top', font_name='monogram', 
-                                batch=main_batch, group=font_group)
-waypoint_label = WaypointDisplay(world_x=10, world_y=36, batch=main_batch)
-
-
-board = HexBoard(radius=64, 
-                 grid_size=4, 
-                 origin_x=main_window.width//2, 
-                 origin_y=main_window.height//2, 
-                 batch=background_batch,
-                 player=player,
-                 window=main_window)
-
-
-clock = pyglet.clock.get_default()
-
-
-@main_window.event
-def on_show():
-    pyglet.event.EventDispatcher.dispatch_event(main_window, 'on_level_start', 1)
-    
-@main_window.event
-def on_level_start(level: int):
-    game_pause = True
-    level_start_screen = LevelStartScreen(background_color=palette['black'][0],
-                                          level=level,
-                                          screen_width=main_window.width,
-                                          screen_height=main_window.height,
-                                          batch=pause_batch)
-
-@main_window.event
-def on_key_press(symbol, modifiers):
-    if game_pause:
-        game_pause = False
-        clock.schedule_interval_soft(board.fade_tile, 0.005)
-    
-    if audio_player.playing == False:
-        audio_player.play()
+        self.hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', batch=self.main_batch, group=self.font_group)
+        self.level_label = pyglet.text.Label('LEVEL 1', font_size=48, x=10, y=self.height-10, anchor_y='top', font_name='monogram', batch=self.main_batch, group=self.font_group)
+        self.waypoint_label = WaypointDisplay(world_x=10, world_y=36, batch=self.main_batch)
         
-    if symbol == key.P:
-        screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
-        pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
+        self.board = HexBoard(radius=64, grid_size=4, origin_x=self.width//2, origin_y=self.height//2, batch=self.background_batch,player=self.player,window=self)
+        
+        self.clock = pyglet.clock.get_default()
     
-    if symbol in player_movement_controls and player.movable():
-        """ Note: Axes are flipped and not in the intuitive orientation. """
-        if symbol == key.Q:
-            board.move_player('UP_LEFT')
-        if symbol == key.W:
-            board.move_player('UP')
-        if symbol == key.E:
-            board.move_player('UP_RIGHT')
-        if symbol == key.A:
-            board.move_player('DOWN_LEFT')
-        if symbol == key.S:
-            board.move_player('DOWN')
-        if symbol == key.D:
-            board.move_player('DOWN_RIGHT')
-        clock.schedule(player.move)
+    def fade_text(self, dt: float, label: pyglet.text.Label):
+        label.color = (label.color[0], label.color[1], label.color[2], label.color[3]-8)
 
-@main_window.event
-def on_waypoint_discovered(color: tuple[int], ability_description: str):
-    hud_label.color = color
-    hud_label.text = ability_description.upper()
-    clock.schedule_interval_for_duration(fade_text, 0.5, 20.0, label=hud_label)
+    def on_show(self):
+        self.dispatch_event('on_level_start', 1)
+        
+    def on_level_start(self, level: int):
+        game_pause = True
+        level_start_screen = LevelStartScreen(background_color=palette['black'][0], level=level, screen_width=self.width, screen_height=self.height, batch=self.pause_batch)
 
-@main_window.event
-def on_draw():
-    main_window.clear()
-    if game_pause:
-        pause_batch.draw()
-    else:
-        background_batch.draw()
-        main_batch.draw()
-    
+    def on_key_press(self, symbol, modifiers):
+        if game_pause:
+            game_pause = False
+            self.clock.schedule_interval_soft(self.board.fade_tile, 0.005)
+        
+        if self.audio_player.playing == False:
+            self.audio_player.play()
+            
+        if symbol == key.P:
+            screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
+            pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
+        
+        if symbol in self.player_movement_controls and self.player.movable():
+            """ Note: Axes are flipped and not in the intuitive orientation. """
+            if symbol == key.Q:
+                self.board.move_player('UP_LEFT')
+            if symbol == key.W:
+                self.board.move_player('UP')
+            if symbol == key.E:
+                self.board.move_player('UP_RIGHT')
+            if symbol == key.A:
+                self.board.move_player('DOWN_LEFT')
+            if symbol == key.S:
+                self.board.move_player('DOWN')
+            if symbol == key.D:
+                self.board.move_player('DOWN_RIGHT')
+            self.clock.schedule(self.player.move)
+
+    def on_waypoint_discovered(self, color: tuple[int], ability_description: str):
+        self.hud_label.color = color
+        self.hud_label.text = ability_description.upper()
+        self.clock.schedule_interval_for_duration(self.fade_text, 0.5, 20.0, label=self.hud_label)
+
+    def on_draw(self):
+        self.clear()
+        if self.pause:
+            self.pause_batch.draw()
+        else:
+            self.background_batch.draw()
+            self.main_batch.draw()
+        
+        
 if __name__ == '__main__':
-    print(main_window.event_types)
-    print(f'user font loaded: {pyglet.font.have_font('pixelator')}')
+    game = Hexscape()
     pyglet.app.run()
