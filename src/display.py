@@ -5,15 +5,46 @@ from pyglet.text.document import InlineElement
 from player import Player
 from resources import empty_hud_waypoint, palette, arrow_icons
 
+
+class LevelStartScreen:
+    def __init__(self, background_color: tuple[int], level: int, screen_width: int, screen_height: int, 
+                 batch: pyglet.graphics.Batch) -> None:
+        
+        self.background = pyglet.shapes.Rectangle(0, 0, screen_width, screen_height,
+                                                  color=background_color,
+                                                  batch=batch, group=pyglet.graphics.Group(order=0))
+        self.level_label = pyglet.text.Label(text=f'Welcome to Mission {level}',
+                                             anchor_x='center', anchor_y='center',
+                                             font_name='monagram', font_size=48,
+                                             batch=batch, group=pyglet.graphics.Group(order=1))
+        pyglet.clock.schedule_interval(self.fade, 0.1, amount=1)
+        
+    def fade(self, dt: float, amount: int):
+        if self.background.opacity > 180:
+            self.background.opacity -= amount
+            self.level_label.opacity -= amount
+        elif self.background.opacity > 100:
+            self.background.opacity -= amount*2
+            self.level_label.opacity -= amount*2
+        else:
+            pyglet.clock.unschedule(self.fade)
+        
+        
 class WaypointDisplay:
-    def __init__(self, batch: pyglet.graphics.Batch):
+    def __init__(self, world_x: int, world_y: int, batch: pyglet.graphics.Batch):
         super().__init__()
         
         keys = ['purple', 'blue', 'green', 'yellow', 'orange', 'red']
-        self.boxes = { k: lambda: pyglet.shapes.BorderedRectangle(x=0, y=i*32, width=32, height=32, border=1, color=(255, 0, 0, 255), border_color=(255, 255, 255, 0), batch=batch) for i, k in enumerate(keys) }
+        self.selection_boxes = { k: pyglet.shapes.BorderedRectangle(x=world_x, y=world_y+(i*32), 
+                                                          width=32, height=32, border=4, 
+                                                          color=palette[k][1], border_color=palette[k][0], 
+                                                          batch=batch) for i, k in enumerate(keys) }
         
     def select(self, waypoint_color: str):
-        self.boxes[waypoint_color].border_color = (self.boxes[waypoint_color].border_color[0], self.boxes[waypoint_color].border_color[1], self.boxes[waypoint_color].border_color[2], 255)
+        self.selection_boxes[waypoint_color].border_color = (self.selection_boxes[waypoint_color].border_color[0], 
+                                                             self.selection_boxes[waypoint_color].border_color[1], 
+                                                             self.selection_boxes[waypoint_color].border_color[2], 
+                                                             255)
     
     
 class ControlDisplay:
@@ -23,7 +54,7 @@ class ControlDisplay:
         
         player_controls = pyglet.text.document.FormattedDocument('CONTROLS')
         self.player_controls_label = pyglet.text.DocumentLabel(player_controls)
-        firstline_width = self.player_controls_label.content_width*1.2//1
+        firstline_width = (self.player_controls_label.content_width*1.2)//1
         
         player_controls.append_text('\n[Q]')
         player_controls.insert_element(len(player_controls.text), arrow_icons['up_left'])

@@ -8,9 +8,8 @@ from pyglet.window import key, mouse
 
 from board import HexBoard
 from player import Player
-from screen_fx import LevelStartScreen
 from resources import palette, hex_icon, ball_image, intro, fade_out
-from display import WaypointDisplay, ControlDisplay
+from display import WaypointDisplay, ControlDisplay, LevelStartScreen
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -19,11 +18,11 @@ main_window = pyglet.window.Window()
 main_window.set_fullscreen(True)
 main_window.set_icon(hex_icon)
 main_window.set_caption('hexscape')
+main_window.register_event_type('on_level_start')
 main_window.register_event_type('on_waypoint_discovered')
 main_window.register_event_type('on_point_scored')
-main_window.register_event_type('on_level_start')
-main_window.register_event_type('on_game_over')
 main_window.register_event_type('on_menu')
+main_window.register_event_type('on_game_over')
 
 
 game_pause = False
@@ -56,7 +55,7 @@ hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram'
 level_label = pyglet.text.Label('LEVEL 1', font_size=48, x=10, y=main_window.height-10, 
                                 anchor_y='top', font_name='monogram', 
                                 batch=main_batch, group=font_group)
-waypoint_label = WaypointDisplay(main_batch)
+waypoint_label = WaypointDisplay(world_x=10, world_y=36, batch=main_batch)
 
 
 board = HexBoard(radius=64, 
@@ -69,7 +68,6 @@ board = HexBoard(radius=64,
 
 
 clock = pyglet.clock.get_default()
-clock.schedule_interval_soft(board.fade_tile, 0.005)
 
 
 @main_window.event
@@ -78,7 +76,6 @@ def on_show():
     
 @main_window.event
 def on_level_start(level: int):
-    global game_pause 
     game_pause = True
     level_start_screen = LevelStartScreen(background_color=palette['black'][0],
                                           level=level,
@@ -88,6 +85,10 @@ def on_level_start(level: int):
 
 @main_window.event
 def on_key_press(symbol, modifiers):
+    if game_pause:
+        game_pause = False
+        clock.schedule_interval_soft(board.fade_tile, 0.005)
+    
     if audio_player.playing == False:
         audio_player.play()
         
@@ -120,12 +121,11 @@ def on_waypoint_discovered(color: tuple[int], ability_description: str):
 @main_window.event
 def on_draw():
     main_window.clear()
-    if not game_pause:
+    if game_pause:
+        pause_batch.draw()
+    else:
         background_batch.draw()
         main_batch.draw()
-    else:
-        print('game is paused')
-        pause_batch.draw()
     
 if __name__ == '__main__':
     print(main_window.event_types)
