@@ -7,27 +7,38 @@ from resources import empty_hud_waypoint, palette, arrow_icons
 
 
 class LevelStartScreen:
-    def __init__(self, background_color: tuple[int], level: int, screen_width: int, screen_height: int, 
-                 batch: pyglet.graphics.Batch) -> None:
-        
-        self.background = pyglet.shapes.Rectangle(0, 0, screen_width, screen_height,
+    def __init__(self, background_color: tuple[int], level: int, screen_width: int, screen_height: int, batch: pyglet.graphics.Batch) -> None:
+        self.background = pyglet.shapes.Rectangle(x=0, y=0, 
+                                                  width=screen_width, height=screen_height,
                                                   color=background_color,
                                                   batch=batch, group=pyglet.graphics.Group(order=0))
-        self.level_label = pyglet.text.Label(text=f'Welcome to Mission {level}',
+        self.level_label = pyglet.text.Label(text=f'-- Welcome to Mission {level} --',
+                                             x=screen_width//2, y=screen_height//2,
                                              anchor_x='center', anchor_y='center',
-                                             font_name='monagram', font_size=48,
+                                             font_name='monogram', font_size=64,
                                              batch=batch, group=pyglet.graphics.Group(order=1))
-        pyglet.clock.schedule_interval(self.fade, 0.1, amount=1)
+        self.instruction_label = pyglet.text.Label(text='[press any key]',
+                                                   x=screen_width//2, y=(screen_height//2)-64,
+                                                   anchor_x='center', anchor_y='center',
+                                                   font_name='monogram', font_size=40,
+                                                   color=(200, 200, 200, 0),  
+                                                   batch=batch)
+        pyglet.clock.schedule_interval(self.fade_label, 0.025, amount=1)
         
-    def fade(self, dt: float, amount: int):
-        if self.background.opacity > 180:
-            self.background.opacity -= amount
+    def fade_label(self, dt: float, amount: int):
+        if self.level_label.opacity > 0:
             self.level_label.opacity -= amount
-        elif self.background.opacity > 100:
-            self.background.opacity -= amount*2
-            self.level_label.opacity -= amount*2
+            self.instruction_label.opacity += amount
         else:
-            pyglet.clock.unschedule(self.fade)
+            self.level_label.text = ''
+            pyglet.clock.unschedule(self.fade_label)
+            pyglet.clock.schedule_interval(self.fade_background, 0.01, amount=5)
+            
+    def fade_background(self, dt: float, amount: int):
+        if self.background.opacity > 5:
+            self.instruction_label.opacity -= amount
+        else:
+            pyglet.clock.unschedule(self.fade_background)
         
         
 class WaypointDisplay:

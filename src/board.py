@@ -47,12 +47,6 @@ class HexBoard:
         potential_waypoints = [Waypoint(type) for type in WaypointType]
         waypoints = random.choices(potential_waypoints, weights=[w.data['rarity'] for w in potential_waypoints], 
                                    k=random.randint(1, level))
-        # self.place_waypoints([WaypointType.RED,
-        #                         WaypointType.GREEN,
-        #                         WaypointType.BLUE,
-        #                         WaypointType.PURPLE,
-        #                         WaypointType.YELLOW,
-        #                         WaypointType.ORANGE])
         self.generate_maze_ver2(self._tiles[self.player_pos])
             
     def boundary_check(self, pre_move: Hex, direction: str):
