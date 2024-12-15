@@ -28,17 +28,18 @@ class LevelStartScreen:
     def fade_label(self, dt: float, amount: int):
         if self.level_label.opacity > 0:
             self.level_label.opacity -= amount
-            self.instruction_label.opacity += amount
+            self.instruction_label.opacity += amount*2
         else:
             self.level_label.text = ''
             pyglet.clock.unschedule(self.fade_label)
-            pyglet.clock.schedule_interval(self.fade_background, 0.01, amount=5)
+            pyglet.clock.schedule_interval(self.fade_instruction, 0.025, amount=1)
             
-    def fade_background(self, dt: float, amount: int):
-        if self.background.opacity > 5:
+    def fade_instruction(self, dt: float, amount: int):
+        if self.instruction_label.opacity > 0:
             self.instruction_label.opacity -= amount
         else:
-            pyglet.clock.unschedule(self.fade_background)
+            self.instruction_label.text = ''
+            pyglet.clock.unschedule(self.fade_instruction)
         
         
 class WaypointDisplay:

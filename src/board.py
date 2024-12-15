@@ -10,7 +10,7 @@ from hex import HexOrientation as hex_util
 from hex import generate_square_grid
 from waypoint import WaypointType, Waypoint
 from player import Player
-from resources import click_sound, fade_out
+from resources import click_sound, fade_out, ball_image
 
 
 class HexBoard:
@@ -130,8 +130,17 @@ class HexBoard:
 
     def apply_sparseness(self, *, probability: int, percent_fill: int):
         
-        while self.fill() < percent_fill:
+        while self.fill() > percent_fill:
             for tile, cell_a in self._tiles.items():
                 if len(list(filter(None, cell_a.walls))) == 5:
                     if random.randint(1, 100) <= probability:
                         self.add_wall(tile, tile)
+                        
+if __name__ == '__main__':
+    test_window = pyglet.window.Window()
+    test_batch = pyglet.graphics.Batch()
+    test_player = Player(ball_image, test_window.width//2, test_window.height//2, test_batch)
+    test_board = HexBoard(radius=64, grid_size=4, origin_x=test_window.width//2, origin_y=test_window.height//2, batch=test_batch,player=test_player,window=test_window)
+    
+    print(f'tile_count: {test_board.tile_count()}')
+    print(f'fill: {test_board.fill()}')

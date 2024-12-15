@@ -26,8 +26,7 @@ class Hexscape(pyglet.window.Window):
         self.register_event_type('on_point_scored')
         self.register_event_type('on_menu')
         self.register_event_type('on_game_over')
-            
-        self.pause = False
+        
         self.pause_batch = pyglet.graphics.Batch()
         self.background_batch = pyglet.graphics.Batch()
         self.font_group = pyglet.graphics.Group(order=3)
@@ -44,12 +43,14 @@ class Hexscape(pyglet.window.Window):
         self.player_movement_controls = [key.Q, key.W, key.E, key.A, key.S, key.D]
         self.player_action_controls = [key.R]
 
+        self.pause = False
+        self.level = 0
+        self.board = HexBoard(radius=64, grid_size=4, origin_x=self.width//2, origin_y=self.height//2, batch=self.background_batch,player=self.player,window=self) 
+        
         self.hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', batch=self.main_batch, group=self.font_group)
-        self.level_label = pyglet.text.Label('Mission 1', font_size=48, x=10, y=self.height-10, anchor_y='top', font_name='monogram', batch=self.main_batch, group=self.font_group)
+        self.level_label = pyglet.text.Label(f'Mission {self.level}', font_size=48, x=10, y=self.height-10, anchor_y='top', font_name='monogram', batch=self.main_batch, group=self.font_group)
         self.waypoint_label = WaypointDisplay(world_x=10, world_y=36, batch=self.main_batch)
         
-        self.board = HexBoard(radius=64, grid_size=4, origin_x=self.width//2, origin_y=self.height//2, batch=self.background_batch,player=self.player,window=self) 
-    
     def fade_text(self, dt: float, label: pyglet.text.Label):
         label.color = (label.color[0], label.color[1], label.color[2], label.color[3]-8)
 
@@ -57,8 +58,10 @@ class Hexscape(pyglet.window.Window):
         self.dispatch_event('on_level_start', 1)
         
     def on_level_start(self, level: int):
+        self.level = level
         self.pause = True
         self.overlay = LevelStartScreen(background_color=palette['black'][0], level=level, screen_width=self.width, screen_height=self.height, batch=self.pause_batch)
+        self.level_label.text = f'Mission {self.level}'
 
     def on_key_press(self, symbol, modifiers):
         if self.pause:
