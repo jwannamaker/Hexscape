@@ -23,37 +23,37 @@ class Waypoint:
             'color': palette['red'][1],
             'ability_description': 'Break through walls temporarily',
             'duration': 5,
-            'rarity': 0.2
+            'spawn_frequency': 0.2
         },
         WaypointType.ORANGE: {
             'color': palette['orange'][1],
             'ability_description': 'Light up the path to an undiscovered waypoint',
             'duration': 3,
-            'rarity': 0.7
+            'spawn_frequency': 0.7
         },
         WaypointType.YELLOW: {
             'color': palette['yellow'][1],
             'ability_description': 'Illuminate all adjacent walls temporarily',
             'duration': 6,
-            'rarity': 0.9
+            'spawn_frequency': 0.9
         },
         WaypointType.GREEN: {
             'color': palette['green'][1],
             'ability_description': 'Highlight undiscovered waypoints temporarily',
             'duration': 8,
-            'rarity': 1.0
+            'spawn_frequency': 1.0
         },
         WaypointType.BLUE: {
             'color': palette['blue'][1],
             'ability_description': 'Boost each move to max distance temporarily',
             'duration': 4,
-            'rarity': 0.1
+            'spawn_frequency': 0.1
         },
         WaypointType.PURPLE: {
             'color': palette['purple'][1],
             'ability_description': 'Teleport to an undiscovered waypoint',
             'duration': 1,
-            'rarity': 0.2
+            'spawn_frequency': 0.2
         }
     }
     
@@ -68,35 +68,31 @@ class Waypoint:
     def activate(self, func: callable):
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(func, self.data['duration'])
-    
+
+
 def print_list(list):
     for l in list:
-        print(f'{l.data['rarity']}\t {l.data['ability_description']}')  
+        print(f'{l.data['spawn_frequency']}\t {l.data['ability_description']}')  
         
+
 if __name__ == '__main__':
     radius = 6
     potential_waypoints = [Waypoint(type) for type in WaypointType]
     for level in range(1, 10):
-        place_these_waypoints = sorted(deque(random.choices(potential_waypoints,
-                                        [w.data['rarity'] for w in potential_waypoints], 
-                                        k=random.randint(level, level+random.randint(1, 3)))),
-                                        key=lambda w: w.data['rarity'])
+        place_these_waypoints = sorted(deque(random.choices(potential_waypoints, [w.data['spawn_frequency'] for w in potential_waypoints], 
+                                                            k=random.randint(level+1, level+random.randint(2, 3)))),
+                                                            key=lambda w: w.data['spawn_frequency'])
+        
+        waypoint_graph = {distance: deque() for distance in range(1, radius+1)}
+        while len(place_these_waypoints) > 0:
+            nearby = random.randint(1, radius//2)
+            far = random.randint(radius//2, radius)
+            
+            current_waypoint = place_these_waypoints.pop()
+            if current_waypoint.data['spawn_frequency'] > 1:
+                waypoint_graph[nearby].append(current_waypoint)
+            else:
+                waypoint_graph[far].append(current_waypoint)
         
         print(f'---- LEVEL {level} -----')
-        print_list(place_these_waypoints)
-        
-        waypoint_graph = {distance: deque(maxlen=distance) for distance in range(1, radius+1)}
-        # while len(place_these_waypoints) > 0:
-        #     distance = random.randint(1, radius)
-            
-        #     if len(waypoint_graph[distance]) == 0: # check if there are waypoints this far away
-        #         waypoint_graph[distance].append(place_these_waypoints.pop()) 
-        #         # place the waypoint so it's sorted in ascending rarity
-        #         # i.e. lower rarity --> HIGHER RARITY
-        
         print(waypoint_graph)
-        
-        print()
-        print()
-        
-        # TODO make sure there are limits on how many of one single type of waypoint spawns

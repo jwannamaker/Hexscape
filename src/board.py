@@ -47,6 +47,7 @@ class HexBoard:
         potential_waypoints = [Waypoint(type) for type in WaypointType]
         waypoints = random.choices(potential_waypoints, weights=[w.data['rarity'] for w in potential_waypoints], 
                                    k=random.randint(1, level))
+        
         self.generate_maze_ver2(self._tiles[self.player_pos])
             
     def boundary_check(self, pre_move: Hex, direction: str):
@@ -132,6 +133,7 @@ class HexBoard:
         
         while self.fill() > percent_fill:
             for tile, cell_a in self._tiles.items():
+                print('')
                 if len(list(filter(None, cell_a.walls))) == 5:
                     if random.randint(1, 100) <= probability:
                         self.add_wall(tile, tile)
