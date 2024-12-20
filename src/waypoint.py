@@ -96,3 +96,6 @@ if __name__ == '__main__':
         
         print(f'---- LEVEL {level} -----')
         print(waypoint_graph)
+        
+        waypoint = Waypoint(WaypointType.BLUE)
+        print(waypoint)

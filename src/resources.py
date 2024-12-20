@@ -84,5 +84,4 @@ center_anchor(hex_icon)
 
 
 empty_hud_waypoint = pyglet.resource.image('empty_waypoint_hud_icon_32x32.png')
-center_anchor(empty_hud_waypoint)
         

@@ -1,4 +1,5 @@
 import random
+from collections import deque
 
 import numpy as np
 import pyglet
@@ -45,10 +46,25 @@ class HexBoard:
     def start_level(self, level: int):
         # randomly determine which waypoints are placed this level
         potential_waypoints = [Waypoint(type) for type in WaypointType]
-        waypoints = random.choices(potential_waypoints, weights=[w.data['rarity'] for w in potential_waypoints], 
+        waypoints = random.choices(potential_waypoints, weights=[w.data['spawn_frequency'] for w in potential_waypoints], 
                                    k=random.randint(1, level))
+        place_these_waypoints = sorted(deque(random.choices(potential_waypoints, [w.data['spawn_frequency'] for w in potential_waypoints], 
+                                                            k=random.randint(level+1, level+random.randint(2, 3)))),
+                                                            key=lambda w: w.data['spawn_frequency'])
         
-        self.generate_maze_ver2(self._tiles[self.player_pos])
+        self.waypoint_graph = {distance: deque() for distance in range(1, self._radius+1)}
+        while len(place_these_waypoints) > 0:
+            nearby = random.randint(1, self._radius//2)
+            far = random.randint(self._radius//2, self._radius)
+            
+            current_waypoint = place_these_waypoints.pop()
+            if current_waypoint.data['spawn_frequency'] > 1:
+                self.waypoint_graph[nearby].append(current_waypoint)
+            else:
+                self.waypoint_graph[far].append(current_waypoint)
+        
+        self.generate_maze_ver1(self._tiles[self.player_pos])
+        # self.generate_maze_ver2(self._tiles[self.player_pos])
             
     def boundary_check(self, pre_move: Hex, direction: str):
         post_move = hex_util.neighbor(pre_move, direction)
@@ -133,7 +149,6 @@ class HexBoard:
         
         while self.fill() > percent_fill:
             for tile, cell_a in self._tiles.items():
-                print('')
                 if len(list(filter(None, cell_a.walls))) == 5:
                     if random.randint(1, 100) <= probability:
                         self.add_wall(tile, tile)

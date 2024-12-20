@@ -43,7 +43,7 @@ class HexCell:
             self.walls[neighbor.coordinate()] = False
 
     def blocked_off(self):
-        return False if True in self.walls else False
+        return False if False in self.walls.values() else True
     
     def remove_wall(self, neighbor: 'HexCell'):
         if self.walls[neighbor.coordinate()]:
@@ -76,3 +76,12 @@ class HexCell:
         if isinstance(self._waypoint, Waypoint):
             self.background.color = self._waypoint.color()
         self.background.opacity = 255
+        
+
+if __name__ == '__main__':
+    cell_a = HexCell(Hex(0, 0, 0), 16, np.array([0, 0]), 'white', pyglet.graphics.Batch())
+    cell_b = HexCell(Hex(0, 1, -1), 16, np.array([0, 0]), 'white', pyglet.graphics.Batch())
+    
+    
+    print(f'blocked off: \t{cell_a.blocked_off()}')
+    
