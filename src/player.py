@@ -7,8 +7,7 @@ from waypoint import Waypoint
 
 
 class Player(pyglet.sprite.Sprite):
-    def __init__(self, img: pyglet.image.Texture, x: int, y: int, 
-                 batch: pyglet.graphics.Batch):
+    def __init__(self, img: pyglet.image.Texture, x: int, y: int, batch: pyglet.graphics.Batch):
         super().__init__(img, x, y, batch=batch)
         self.current_position = pyglet.math.Vec2(self.x, self.y)
         self.next_position = deque([])
@@ -40,6 +39,8 @@ class Player(pyglet.sprite.Sprite):
             self.next_position.append(pyglet.math.Vec2(*screen_position))
     
     def collect_waypoint(self, waypoint: Waypoint):
+        if self.waypoint_collection[waypoint.type]:
+            print('previously collected waypoint overriden')
         self.waypoint_collection[waypoint.type] = waypoint
     
     def activate_waypoint(self, color: str):

@@ -13,9 +13,7 @@ class HexCell:
 
         self.center_x = hex_util.center(self.hex_coordinate, radius, screen_origin)[0]
         self.center_y = hex_util.center(self.hex_coordinate, radius, screen_origin)[1]
-        self.background = pyglet.shapes.Polygon(*hex_util.corners(radius, self.center_x, self.center_y),
-                                                color=palette[background_color][0],
-                                                batch=batch)
+        self.background = pyglet.shapes.Polygon(*hex_util.corners(radius, self.center_x, self.center_y), color=palette[background_color][0], batch=batch)
         self.background.opacity = 0
 
         # For maze generation

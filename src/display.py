@@ -15,34 +15,36 @@ class LevelStartScreen:
         pyglet.clock.schedule_interval(self.fade_label, 0.025, amount=1)
         
     def fade_label(self, dt: float, amount: int):
-        if self.level_label.opacity > 0:
-            self.level_label.opacity -= amount
-            self.instruction_label.opacity += amount*2
+        if self.instruction_label.opacity < 255:
+            self.instruction_label.opacity += amount
         else:
-            self.level_label.text = ''
+            self.instruction_label.opacity = 255
             pyglet.clock.unschedule(self.fade_label)
-            pyglet.clock.schedule_interval(self.fade_instruction, 0.025, amount=1)
-            
-    def fade_instruction(self, dt: float, amount: int):
-        if self.instruction_label.opacity > 0:
-            self.instruction_label.opacity -= amount
-        else:
-            self.instruction_label.text = ''
-            pyglet.clock.unschedule(self.fade_instruction)
         
         
 class WaypointDisplay:
     def __init__(self, world_x: int, world_y: int, batch: pyglet.graphics.Batch):
         super().__init__()
-        
-        keys = ['purple', 'blue', 'green', 'yellow', 'orange', 'red']
         radius = 32
-        self.select_polygons = {k: pyglet.shapes.Polygon(*hex_util.corners(radius, world_x+radius, world_y+(i*2*radius)+radius), color=palette[k][1], batch=batch) for i, k in enumerate(keys)}
-        self.foreground_polygons = {k: pyglet.shapes.Polygon(*hex_util.corners(24, world_x+radius, world_y+(i*2*radius)+radius), color=palette['black'][0], batch=batch) for i, k in enumerate(keys)}
         
+        far_back = pyglet.graphics.Group(order=0)
+        back = pyglet.graphics.Group(order=1)
+        front = pyglet.graphics.Group(order=2)
         
-    # def select(self, waypoint_color: str):
-    #     self.selection_boxes[waypoint_color].border_color = (self.selection_boxes[waypoint_color].border_color[0], self.selection_boxes[waypoint_color].border_color[1], self.selection_boxes[waypoint_color].border_color[2], 255)
+        self.keys = ['purple', 'blue', 'green', 'yellow', 'orange', 'red']
+        self.selected_color_index = -1
+        self.selection_ring = pyglet.shapes.Polygon(*hex_util.corners(radius+4, world_x+radius, world_y+radius), color=palette['white'][0], batch=batch, group=far_back)
+        self.icon_polygons = {k: pyglet.shapes.Polygon(*hex_util.corners(radius, world_x+radius, world_y+(i*2*radius)+radius), color=palette[k][1], batch=batch, group=back) for i, k in enumerate(self.keys)}
+        for icon in self.icon_polygons.values():
+            icon.opacity = 80
+        self.inner_polygons = {k: pyglet.shapes.Polygon(*hex_util.corners(radius, world_x+radius, world_y+(i*2*radius)+radius), color=palette['black'][0], batch=batch, group=front) for i, k in enumerate(self.keys)}
+        
+    def move_select(self):
+        self.selected_color_index += 1 if self.selected_color_index < len(self.keys) else -len(self.keys)
+        self.selection_ring.position = self.icon_polygons[self.keys[self.selected_color_index]].position
+    
+    def show_collected(self, waypoint_color: str):
+        self.icon_polygons[waypoint_color].opacity = 100
     
     
 class ControlDisplay:

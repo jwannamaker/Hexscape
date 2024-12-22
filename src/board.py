@@ -28,8 +28,7 @@ class HexBoard:
         self._batch = batch
         self._window = window
         
-        self._tiles = {coordinate: HexCell(coordinate, self._radius, self._origin, 'white', self._batch) 
-                       for coordinate in generate_square_grid(self._grid_size)}
+        self._tiles = {coordinate: HexCell(coordinate, self._radius, self._origin, 'white', self._batch) for coordinate in generate_square_grid(self._grid_size)}
         
         self.player_pos = Hex(0, 0, 0)
         self.player = player
@@ -44,13 +43,9 @@ class HexBoard:
         return key in self._tiles
     
     def start_level(self, level: int):
-        # randomly determine which waypoints are placed this level
         potential_waypoints = [Waypoint(type) for type in WaypointType]
-        waypoints = random.choices(potential_waypoints, weights=[w.data['spawn_frequency'] for w in potential_waypoints], 
-                                   k=random.randint(1, level))
-        place_these_waypoints = sorted(deque(random.choices(potential_waypoints, [w.data['spawn_frequency'] for w in potential_waypoints], 
-                                                            k=random.randint(level+1, level+random.randint(2, 3)))),
-                                                            key=lambda w: w.data['spawn_frequency'])
+        waypoints = random.choices(potential_waypoints, weights=[w.data['spawn_frequency'] for w in potential_waypoints], k=random.randint(1, level))
+        place_these_waypoints = sorted(deque(random.choices(potential_waypoints, [w.data['spawn_frequency'] for w in potential_waypoints], k=random.randint(level+1, level+random.randint(2, 3)))), key=lambda w: w.data['spawn_frequency'])
         
         self.waypoint_graph = {distance: deque() for distance in range(1, self._radius+1)}
         while len(place_these_waypoints) > 0:
@@ -89,10 +84,7 @@ class HexBoard:
         potential_waypoint = self._tiles[self.player_pos].waypoint()
         if isinstance(potential_waypoint, Waypoint) and str(potential_waypoint) not in self.player.waypoint_collection:
             self.player.collect_waypoint(potential_waypoint)
-            pyglet.event.EventDispatcher.dispatch_event(self._window,
-                                                        'on_waypoint_discovered',
-                                                        potential_waypoint.color(),
-                                                        potential_waypoint.ability_description())
+            pyglet.event.EventDispatcher.dispatch_event(self._window, 'on_waypoint_discovered', potential_waypoint.color(), potential_waypoint.ability_description())
             self._tiles[self.player_pos].remove_waypoint()
         
         next_position = hex_util.center(self.player_pos, self._radius, self._origin)

@@ -49,7 +49,7 @@ class Hexscape(pyglet.window.Window):
         
         self.hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', batch=self.main_batch, group=self.font_group)
         self.level_label = pyglet.text.Label(f'Mission {self.level}', font_size=48, x=10, y=self.height-10, anchor_y='top', font_name='monogram', batch=self.main_batch, group=self.font_group)
-        self.waypoint_label = WaypointDisplay(world_x=10, world_y=36, batch=self.main_batch)
+        self.waypoint_display = WaypointDisplay(world_x=10, world_y=36, batch=self.main_batch)
         
     def fade_text(self, dt: float, label: pyglet.text.Label):
         label.color = (label.color[0], label.color[1], label.color[2], label.color[3]-8)
@@ -89,6 +89,9 @@ class Hexscape(pyglet.window.Window):
             if symbol == key.D:
                 self.board.move_player('DOWN_RIGHT')
             self.clock.schedule(self.player.move)
+        
+        if symbol == key.TAB:
+            self.waypoint_display.move_select()
 
     def on_waypoint_discovered(self, color: tuple[int], ability_description: str):
         self.hud_label.color = color
