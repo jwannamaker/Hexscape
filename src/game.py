@@ -97,6 +97,8 @@ class Hexscape(pyglet.window.Window):
         self.hud_label.color = color
         self.hud_label.text = ability_description.upper()
         self.clock.schedule_interval_for_duration(self.fade_text, 0.5, 20.0, label=self.hud_label)
+        
+        
 
     def on_draw(self):
         self.clear()

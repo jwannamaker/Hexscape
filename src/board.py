@@ -59,7 +59,6 @@ class HexBoard:
                 self.waypoint_graph[far].append(current_waypoint)
         
         self.generate_maze_ver1(self._tiles[self.player_pos])
-        # self.generate_maze_ver2(self._tiles[self.player_pos])
             
     def boundary_check(self, pre_move: Hex, direction: str):
         post_move = hex_util.neighbor(pre_move, direction)
@@ -84,7 +83,7 @@ class HexBoard:
         potential_waypoint = self._tiles[self.player_pos].waypoint()
         if isinstance(potential_waypoint, Waypoint) and str(potential_waypoint) not in self.player.waypoint_collection:
             self.player.collect_waypoint(potential_waypoint)
-            pyglet.event.EventDispatcher.dispatch_event(self._window, 'on_waypoint_discovered', potential_waypoint.color(), potential_waypoint.ability_description())
+            self._window.dispatch_event('on_waypoint_discovered', potential_waypoint.color(), potential_waypoint.ability_description())
             self._tiles[self.player_pos].remove_waypoint()
         
         next_position = hex_util.center(self.player_pos, self._radius, self._origin)
