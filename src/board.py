@@ -64,8 +64,6 @@ class HexBoard:
                 self.waypoint_graph[far_radius].append(current_waypoint)
                 rand_pos = random.choice(hex_util.ring(Hex(0, 0, 0), far_radius))
             
-            for pos in self._tiles:
-                print(pos)
             if not self._tiles[rand_pos].waypoint():
                 self._tiles[rand_pos].place_waypoint(current_waypoint)
         
