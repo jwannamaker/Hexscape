@@ -85,9 +85,9 @@ class HexOrientation:
         return HexOrientation.round(((screen_pos - origin) / radius) @ HexOrientation.pixel_to_hex)
     
     ADJACENT_DIRECTION = {             # Prev    NOW
-        'UP_RIGHT':   Hex(+1,  0, -1), # D       E
-        'UP':         Hex( 0, +1, -1), # S       W
         'UP_LEFT':    Hex(-1, +1,  0), # A       Q
+        'UP':         Hex( 0, +1, -1), # S       W
+        'UP_RIGHT':   Hex(+1,  0, -1), # D       E
         'DOWN_RIGHT': Hex(+1, -1,  0), # Q       D
         'DOWN':       Hex( 0, -1, +1), # W       S
         'DOWN_LEFT':  Hex(-1,  0, +1)  # E       A
@@ -142,9 +142,9 @@ class HexOrientation:
     @staticmethod 
     def ring(center: Hex, radius: int):
         results = []
-        h = center + HexOrientation.scale(HexOrientation.ADJACENT_DIRECTION['UP'], radius)
+        h = center + HexOrientation.scale(HexOrientation.ADJACENT_DIRECTION['DOWN'], radius)
         
-        for direction in ['DOWN_RIGHT', 'DOWN', 'DOWN_LEFT', 'UP_LEFT', 'UP', 'UP_RIGHT']:
+        for direction in HexOrientation.ADJACENT_DIRECTION:
             for _ in range(0, radius):
                 results.append(h)
                 h = HexOrientation.neighbor(h, direction)
