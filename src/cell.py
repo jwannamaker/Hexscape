@@ -72,7 +72,7 @@ class HexCell:
 
     def highlight(self):
         if isinstance(self._waypoint, Waypoint):
-            self.background.color = self._waypoint.color()
+            self.background.color = self._waypoint.data['color']
         self.background.opacity = 255
         
 

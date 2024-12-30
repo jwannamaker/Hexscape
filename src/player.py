@@ -3,7 +3,7 @@ from collections import deque
 import pyglet
 import numpy as np
 
-from waypoint import Waypoint
+from waypoint import Waypoint, WaypointType
 
 
 class Player(pyglet.sprite.Sprite):
@@ -13,7 +13,7 @@ class Player(pyglet.sprite.Sprite):
         self.next_position = deque([])
         self._movable = True
         
-        self.waypoint_collection : dict[str, Waypoint] = {}
+        self.waypoint_collection : dict[WaypointType, Waypoint] = {}
         self.active_waypoints = deque()
     
     def movable(self):
@@ -47,7 +47,7 @@ class Player(pyglet.sprite.Sprite):
         if color in self.waypoint_collection and color not in self.active_waypoints:
             self.waypoint_collection[color].activate()
             self.active_waypoints.append(color)
-            
+    
     def actionable(self):
         actionable = False
         for color in self.waypoint_collection:

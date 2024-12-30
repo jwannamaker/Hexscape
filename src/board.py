@@ -28,13 +28,13 @@ class HexBoard:
         self._batch = batch
         self._window = window
         
-        self._tiles = {coordinate: HexCell(coordinate, self._radius, self._origin, 'white', self._batch) for coordinate in generate_square_grid(self._grid_size)}
-        
         self.player_pos = Hex(0, 0, 0)
         self.player = player
         self._player_trail = dict()
         self._player_trail[self.player_pos] = 0
         self._hit_walls = []
+        
+        self._tiles = {coordinate: HexCell(coordinate, self._radius, self._origin, 'white', self._batch) for coordinate in generate_square_grid(self._grid_size)}
         self._tiles[self.player_pos].highlight()
         
         self.start_level(1)
@@ -43,20 +43,31 @@ class HexBoard:
         return key in self._tiles
     
     def start_level(self, level: int):
-        potential_waypoints = [Waypoint(type) for type in WaypointType]
-        waypoints = random.choices(potential_waypoints, weights=[w.data['spawn_frequency'] for w in potential_waypoints], k=random.randint(1, level))
-        place_these_waypoints = sorted(deque(random.choices(potential_waypoints, [w.data['spawn_frequency'] for w in potential_waypoints], k=random.randint(level+1, level+random.randint(2, 3)))), key=lambda w: w.data['spawn_frequency'])
+        waypoints = [Waypoint(type) for type in WaypointType]
+        weights = [w.data['spawn_frequency'] for w in waypoints]
+        place_these_waypoints = deque(random.choices(waypoints, weights, k=random.randint(level + 1, level + 3)))
         
-        self.waypoint_graph = {distance: deque() for distance in range(1, self._radius+1)}
-        while len(place_these_waypoints) > 0:
-            nearby = random.randint(1, self._radius//2)
-            far = random.randint(self._radius//2, self._radius)
-            
+        self.waypoint_graph = {distance: [] for distance in range(1, self._grid_size + 1)}
+        while place_these_waypoints:
             current_waypoint = place_these_waypoints.pop()
+            
+            max_radius = self._grid_size // 2
+            half_radius = max_radius // 2
+            near_radius = random.randint(1, half_radius)
+            far_radius = random.randint(half_radius, max_radius)
+            
+            rand_pos = Hex(0, 0, 0)
             if current_waypoint.data['spawn_frequency'] > 1:
-                self.waypoint_graph[nearby].append(current_waypoint)
+                self.waypoint_graph[near_radius].append(current_waypoint)
+                rand_pos = random.choice(hex_util.ring(Hex(0, 0, 0), near_radius))
             else:
-                self.waypoint_graph[far].append(current_waypoint)
+                self.waypoint_graph[far_radius].append(current_waypoint)
+                rand_pos = random.choice(hex_util.ring(Hex(0, 0, 0), far_radius))
+            
+            for pos in self._tiles:
+                print(pos)
+            if not self._tiles[rand_pos].waypoint():
+                self._tiles[rand_pos].place_waypoint(current_waypoint)
         
         self.generate_maze_ver1(self._tiles[self.player_pos])
             
@@ -81,7 +92,7 @@ class HexBoard:
         self._tiles[self.player_pos].highlight()
         
         potential_waypoint = self._tiles[self.player_pos].waypoint()
-        if isinstance(potential_waypoint, Waypoint) and str(potential_waypoint) not in self.player.waypoint_collection:
+        if isinstance(potential_waypoint, Waypoint) and potential_waypoint not in self.player.waypoint_collection.values():
             self.player.collect_waypoint(potential_waypoint)
             self._window.dispatch_event('on_waypoint_discovered', potential_waypoint.color(), potential_waypoint.ability_description())
             self._tiles[self.player_pos].remove_waypoint()
@@ -123,7 +134,7 @@ class HexBoard:
                     
     def generate_maze_ver2(self, current_tile: HexCell):
         self.generate_maze_ver1(current_tile)
-        self.apply_sparseness(probability=100, percent_fill=75)
+        self.apply_sparseness(probability=10, percent_fill=75)
     
     def tile_count(self):
         return len(self._tiles.values())

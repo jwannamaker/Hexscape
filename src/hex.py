@@ -116,6 +116,10 @@ class HexOrientation:
         return [hex + direction for direction in list(HexOrientation.ADJACENT_DIRECTION.values())]
     
     @staticmethod
+    def diagonal_neighbors(hex: Hex):
+        return [hex + direction for direction in list(HexOrientation.DIAGONAL_DIRECTION).values()]
+    
+    @staticmethod
     def search_nearby(hex: Hex, search_distance: int):
         """ Returns a list of hex coordinates within search_distance to the given 
         hex coordinate.
@@ -129,6 +133,22 @@ class HexOrientation:
             for r in range(start_r, stop_r + 1, 1):
                 s = -q - r
                 results.append(hex + Hex(q, r, s))
+        return results
+    
+    @staticmethod 
+    def scale(hex: Hex, factor: int):
+        return Hex(hex.q * factor, hex.r * factor, hex.s * factor)
+    
+    @staticmethod 
+    def ring(center: Hex, radius: int):
+        results = []
+        h = center + HexOrientation.scale(HexOrientation.ADJACENT_DIRECTION['UP'], radius)
+        
+        for direction in ['DOWN_RIGHT', 'DOWN', 'DOWN_LEFT', 'UP_LEFT', 'UP', 'UP_RIGHT']:
+            for _ in range(0, radius):
+                results.append(h)
+                h = HexOrientation.neighbor(h, direction)
+        
         return results
     
     @staticmethod
@@ -158,3 +178,13 @@ def generate_square_grid(grid_size):
             s = -q - r
             coordinates.append(Hex(q, r, s))
     return coordinates
+    
+    
+if __name__ == "__main__":
+    start_hex = Hex(0, 0, 0)
+    
+    print(f'start:\t{start_hex}')
+    
+    ring = HexOrientation.ring(start_hex, 1)
+    for i, r in enumerate(ring):
+        print(f'{i}:\t{r}')
