@@ -1,6 +1,7 @@
 import datetime
-import time
-from collections import namedtuple
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='hexscape.log', level=logging.INFO)
 
 import pyglet
 from pyglet import gl
@@ -108,5 +109,7 @@ class Hexscape(pyglet.window.Window):
         
         
 if __name__ == '__main__':
+    
     game = Hexscape()
     pyglet.app.run()
+    logger.info('program aborted')

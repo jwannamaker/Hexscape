@@ -182,9 +182,8 @@ def generate_square_grid(grid_size):
     
 if __name__ == "__main__":
     start_hex = Hex(0, 0, 0)
+    print(f'start: {start_hex}')
     
-    print(f'start:\t{start_hex}')
-    
-    ring = HexOrientation.ring(start_hex, 1)
+    ring = HexOrientation.ring(start_hex, 2)
     for i, r in enumerate(ring):
-        print(f'{i}:\t{r}')
+        print(f'{i}: {r}')
