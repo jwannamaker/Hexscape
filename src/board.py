@@ -91,7 +91,7 @@ class HexBoard:
         potential_waypoint = self._tiles[self.player_pos].waypoint()
         if potential_waypoint and potential_waypoint not in self.player.waypoint_collection.values():
             self.player.collect_waypoint(potential_waypoint)
-            self._window.dispatch_event('on_waypoint_discovered', potential_waypoint.data['color'], potential_waypoint.ability_description())
+            self._window.dispatch_event('on_waypoint_discovered', potential_waypoint.data['color'], potential_waypoint.data['ability_description'])
             self._tiles[self.player_pos].remove_waypoint()
         
         next_position = hex_util.center(self.player_pos, self._radius, self._origin)

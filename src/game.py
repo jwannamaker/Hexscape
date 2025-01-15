@@ -63,6 +63,8 @@ class Hexscape(pyglet.window.Window):
         self.pause = True
         self.overlay = LevelStartScreen(background_color=palette['black'][0], level=level, screen_width=self.width, screen_height=self.height, batch=self.pause_batch)
         self.level_label.text = f'Mission {self.level}'
+        
+        logger.info(f'Level {level} started')
 
     def on_key_press(self, symbol, modifiers):
         if self.pause:
@@ -75,21 +77,30 @@ class Hexscape(pyglet.window.Window):
         if symbol == key.P:
             screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
             pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
+            logger.info(f'Screenshot saved as {screenshot_name}')
         
         if symbol in self.player_movement_controls and self.player.movable():
+            attempt_dir = ''
             if symbol == key.Q:
                 self.board.move_player('UP_LEFT')
+                attempt_dir = 'UP_LEFT'
             if symbol == key.W:
                 self.board.move_player('UP')
+                attempt_dir = 'UP'
             if symbol == key.E:
                 self.board.move_player('UP_RIGHT')
+                attempt_dir = 'UP_RIGHT'
             if symbol == key.A:
                 self.board.move_player('DOWN_LEFT')
+                attempt_dir = 'DOWN_LEFT'
             if symbol == key.S:
                 self.board.move_player('DOWN')
+                attempt_dir = 'DOWN'
             if symbol == key.D:
                 self.board.move_player('DOWN_RIGHT')
+                attempt_dir = 'DOWN_RIGHT'
             self.clock.schedule(self.player.move)
+            logger.info(f'Player attempted move')
         
         if symbol == key.TAB:
             self.waypoint_display.move_select()
@@ -109,7 +120,5 @@ class Hexscape(pyglet.window.Window):
         
         
 if __name__ == '__main__':
-    
     game = Hexscape()
     pyglet.app.run()
-    logger.info('program aborted')

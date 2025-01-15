@@ -14,7 +14,7 @@ class Player(pyglet.sprite.Sprite):
         self._movable = True
         
         self.waypoint_collection : dict[WaypointType, Waypoint] = {}
-        self.active_waypoints = deque()
+        self.active_waypoints : deque[WaypointType] = deque()
     
     def movable(self):
         return self._movable
@@ -39,14 +39,12 @@ class Player(pyglet.sprite.Sprite):
             self.next_position.append(pyglet.math.Vec2(*screen_position))
     
     def collect_waypoint(self, waypoint: Waypoint):
-        if self.waypoint_collection[waypoint.type]:
-            print('previously collected waypoint overriden')
         self.waypoint_collection[waypoint.type] = waypoint
     
-    def activate_waypoint(self, color: str):
-        if color in self.waypoint_collection and color not in self.active_waypoints:
-            self.waypoint_collection[color].activate()
-            self.active_waypoints.append(color)
+    def activate_waypoint(self,  waypoint_type: WaypointType):
+        if waypoint_type in self.waypoint_collection and waypoint_type not in self.active_waypoints:
+            self.waypoint_collection[waypoint_type].activate()
+            self.active_waypoints.append(waypoint_type)
     
     def actionable(self):
         actionable = False
