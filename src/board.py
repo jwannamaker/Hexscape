@@ -41,30 +41,32 @@ class HexBoard:
     def __contains__(self, key: Hex):
         return key in self._tiles
     
-    def start_level(self, level: int):
-        waypoints = [Waypoint(type) for type in WaypointType]
-        weights = [w.data['spawn_frequency'] for w in waypoints]
-        place_these_waypoints = deque(random.choices(waypoints, weights, k=random.randint(level + 1, level + 3)))
+    def random_waypoints_for_level(self, level: int):
+        all_waypoints = [Waypoint(type) for type in WaypointType]
+        weights = [w.spawn_frequency() for w in all_waypoints]
+        return deque(random.choices(all_waypoints, weights, k=random.randint(level + 1, level + 3)))
+    
+    def random_weighted_distance(self, spawn_frequency: float):
+        near_radius = random.randint(1, self._grid_size // 4)
+        far_radius = random.randint(self._grid_size // 4, self._grid_size // 2)
+        if spawn_frequency > 1:
+            return near_radius
+        else:
+            return far_radius
         
+    def start_level(self, level: int):
+        current_level_waypoints = self.random_waypoints_for_level(level)
         self.waypoint_graph = {distance: [] for distance in range(1, self._grid_size + 1)}
-        while place_these_waypoints:
-            current_waypoint = place_these_waypoints.pop()
-            
-            max_radius = self._grid_size // 2
-            half_radius = max_radius // 2
-            near_radius = random.randint(1, half_radius)
-            far_radius = random.randint(half_radius, max_radius)
-            
-            rand_pos = Hex(0, 0, 0)
-            if current_waypoint.data['spawn_frequency'] > 1:
-                self.waypoint_graph[near_radius].append(current_waypoint)
-                rand_pos = random.choice(hex_util.ring(Hex(0, 0, 0), near_radius))
-            else:
-                self.waypoint_graph[far_radius].append(current_waypoint)
-                rand_pos = random.choice(hex_util.ring(Hex(0, 0, 0), far_radius))
+        
+        while current_level_waypoints:
+            current_waypoint = current_level_waypoints.pop()
+            rand_radius = self.random_weighted_distance(current_waypoint.spawn_frequency())
+            rand_pos = random.choice(hex_util.ring(Hex(0, 0, 0), rand_radius))
             
             if not self._tiles[rand_pos].waypoint():
                 self._tiles[rand_pos].place_waypoint(current_waypoint)
+            else:
+                current_level_waypoints.appendleft(current_waypoint)
         
         self.generate_maze_ver1(self._tiles[self.player_pos])
             
