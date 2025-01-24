@@ -68,7 +68,23 @@ class Waypoint:
         self.data = Waypoint.__data[type]
         self.activated = False
     
+    def color_name(self) -> str:
+        return self.type.name
+    
+    def color(self) -> tuple[int]:
+        return Waypoint.__data[self.type]['color']
+    
+    def ability_description(self) -> str:
+        return Waypoint.__data[self.type]['ability_description']
+    
+    def duration(self):
+        return Waypoint.__data[self.type]['duration']
+    
+    def spawn_frequency(self) -> float:
+        return Waypoint.__data[self.type]['spawn_frequency']
+    
     def activate(self, func: callable):
+        """ func must take duration (int) as a parameter. """
         self.activated = True
         pyglet.clock.schedule_interval_for_duration(func, self.data['duration'])
 
@@ -80,3 +96,6 @@ def print_list(list):
 if __name__ == '__main__':
     waypoints = [Waypoint(type) for type in WaypointType]
     print(waypoints)
+    
+    blue = Waypoint(WaypointType.BLUE)
+    print(blue.color_name())

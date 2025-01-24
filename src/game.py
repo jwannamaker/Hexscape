@@ -9,6 +9,7 @@ from pyglet.window import key, mouse
 
 from board import HexBoard
 from player import Player
+from waypoint import WaypointType, Waypoint
 from resources import palette, hex_icon, ball_image, intro, fade_out
 from display import WaypointDisplay, ControlDisplay, LevelStartScreen
 
@@ -100,15 +101,18 @@ class Hexscape(pyglet.window.Window):
                 self.board.move_player('DOWN_RIGHT')
                 attempt_dir = 'DOWN_RIGHT'
             self.clock.schedule(self.player.move)
-            logger.info(f'Player attempted move')
+            
+            logger.info(f'Player attempted move in {attempt_dir} direction')
+            logger.info(f'Player position updated to {self.board.player_pos}')
         
         if symbol == key.TAB:
             self.waypoint_display.move_select()
 
-    def on_waypoint_discovered(self, color: tuple[int], ability_description: str):
-        self.hud_label.color = color
-        self.hud_label.text = ability_description.upper()
+    def on_waypoint_discovered(self, waypoint: Waypoint):
+        self.hud_label.color = waypoint.data['color']
+        self.hud_label.text = Waypoint.__data[waypoint.type]['ability_description'].upper()
         self.clock.schedule_interval_for_duration(self.fade_text, 0.5, 20.0, label=self.hud_label)
+        logger.debug(f'{waypoint.type} Waypoint discovered @ {self.board.player_pos}')
         
     def on_draw(self):
         self.clear()
