@@ -1,9 +1,13 @@
+import logging
 from collections import deque
 
 import pyglet
 import numpy as np
 
 from waypoint import Waypoint, WaypointType
+
+logging.basicConfig(filename='player.log')
+logger = logging.getLogger(__name__)
 
 
 class Player(pyglet.sprite.Sprite):
@@ -40,6 +44,8 @@ class Player(pyglet.sprite.Sprite):
     
     def collect_waypoint(self, waypoint: Waypoint):
         self.waypoint_collection[waypoint.type] = waypoint
+        logger.log(logging.DEBUG, f'Player collected a {waypoint.color_name()} waypoint')
+        logger.log(logging.DEBUG, f'Player waypoint collection now {self.waypoint_collection}')
     
     def activate_waypoint(self,  waypoint_type: WaypointType):
         if waypoint_type in self.waypoint_collection and waypoint_type not in self.active_waypoints:

@@ -1,7 +1,5 @@
 import datetime
 import logging
-logger = logging.getLogger(__name__)
-logging.basicConfig(filename='hexscape.log', level=logging.INFO)
 
 import pyglet
 from pyglet import gl
@@ -12,6 +10,9 @@ from player import Player
 from waypoint import WaypointType, Waypoint
 from resources import palette, hex_icon, ball_image, intro, fade_out
 from display import WaypointDisplay, ControlDisplay, LevelStartScreen
+
+logging.basicConfig(filename='game.log')
+logger = logging.getLogger(__name__)
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -47,7 +48,7 @@ class Hexscape(pyglet.window.Window):
 
         self.pause = False
         self.level = 0
-        self.board = HexBoard(radius=64, grid_size=4, origin_x=self.width//2, origin_y=self.height//2, batch=self.background_batch,player=self.player,window=self) 
+        self.board = HexBoard(radius=64, grid_size=4, origin_x=self.width//2, origin_y=self.height//2, batch=self.background_batch, player=self.player, window=self, logger=self.logger) 
         
         self.hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', batch=self.main_batch, group=self.font_group)
         self.level_label = pyglet.text.Label(f'Mission {self.level}', font_size=48, x=10, y=self.height-10, anchor_y='top', font_name='monogram', batch=self.main_batch, group=self.font_group)
@@ -65,7 +66,7 @@ class Hexscape(pyglet.window.Window):
         self.overlay = LevelStartScreen(background_color=palette['black'][0], level=level, screen_width=self.width, screen_height=self.height, batch=self.pause_batch)
         self.level_label.text = f'Mission {self.level}'
         
-        logger.info(f'Level {level} started')
+        logger.log(logging.INFO, f'Level {level} started @ {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}')
 
     def on_key_press(self, symbol, modifiers):
         if self.pause:
@@ -78,41 +79,34 @@ class Hexscape(pyglet.window.Window):
         if symbol == key.P:
             screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
             pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
-            logger.info(f'Screenshot saved as {screenshot_name}')
+            logger.log(logging.INFO, f'Screenshot saved as {screenshot_name}')
         
         if symbol in self.player_movement_controls and self.player.movable():
-            attempt_dir = ''
             if symbol == key.Q:
                 self.board.move_player('UP_LEFT')
-                attempt_dir = 'UP_LEFT'
             if symbol == key.W:
                 self.board.move_player('UP')
-                attempt_dir = 'UP'
             if symbol == key.E:
                 self.board.move_player('UP_RIGHT')
-                attempt_dir = 'UP_RIGHT'
             if symbol == key.A:
                 self.board.move_player('DOWN_LEFT')
-                attempt_dir = 'DOWN_LEFT'
             if symbol == key.S:
                 self.board.move_player('DOWN')
-                attempt_dir = 'DOWN'
             if symbol == key.D:
                 self.board.move_player('DOWN_RIGHT')
-                attempt_dir = 'DOWN_RIGHT'
             self.clock.schedule(self.player.move)
-            
-            logger.info(f'Player attempted move in {attempt_dir} direction')
-            logger.info(f'Player position updated to {self.board.player_pos}')
         
         if symbol == key.TAB:
             self.waypoint_display.move_select()
 
     def on_waypoint_discovered(self, waypoint: Waypoint):
-        self.hud_label.color = waypoint.data['color']
-        self.hud_label.text = Waypoint.__data[waypoint.type]['ability_description'].upper()
-        self.clock.schedule_interval_for_duration(self.fade_text, 0.5, 20.0, label=self.hud_label)
-        logger.debug(f'{waypoint.type} Waypoint discovered @ {self.board.player_pos}')
+        logger.log(logging.DEBUG, f'{waypoint.color_name()} Waypoint discovered @ {self.board.player_pos}')
+        self.hud_label.color = waypoint.color()
+        self.hud_label.text = waypoint.ability_description()
+        self.clock.schedule_interval_for_duration(self.fade_text, 0.5, 10.0, label=self.hud_label)
+        
+        self.player.collect_waypoint(waypoint)
+        self.waypoint_display.show_collected(waypoint.color_name())
         
     def on_draw(self):
         self.clear()
@@ -124,5 +118,5 @@ class Hexscape(pyglet.window.Window):
         
         
 if __name__ == '__main__':
-    game = Hexscape()
+    game = Hexscape(logging.getLogger(__name__))
     pyglet.app.run()

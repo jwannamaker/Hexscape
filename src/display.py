@@ -1,3 +1,5 @@
+import logging
+
 import pyglet
 from pyglet.text.layout import TextLayout
 from pyglet.text.document import InlineElement
@@ -5,6 +7,8 @@ from pyglet.text.document import InlineElement
 from hex import HexOrientation as hex_util
 from player import Player
 from resources import empty_hud_waypoint, palette, arrow_icons
+
+
 
 
 class DisplayElement(pyglet.text.Label):
@@ -61,7 +65,7 @@ class WaypointDisplay:
         self.selection_ring.position = self.icon_polygons[self.keys[self.selected_color_index]].position
     
     def show_collected(self, waypoint_color: str):
-        self.icon_polygons[waypoint_color].opacity = 255
+        self.icon_polygons[waypoint_color.lower()].opacity = 255
     
     
 class ControlDisplay:
