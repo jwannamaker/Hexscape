@@ -11,8 +11,8 @@ from waypoint import WaypointType, Waypoint
 from resources import palette, hex_icon, ball_image, intro, fade_out
 from display import WaypointDisplay, ControlDisplay, LevelStartScreen
 
-logging.basicConfig(filename='game.log')
-logger = logging.getLogger(__name__)
+logging.basicConfig(filename='game.log', level=logging.DEBUG)
+logger = logging.getLogger()
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -48,7 +48,7 @@ class Hexscape(pyglet.window.Window):
 
         self.pause = False
         self.level = 0
-        self.board = HexBoard(radius=64, grid_size=4, origin_x=self.width//2, origin_y=self.height//2, batch=self.background_batch, player=self.player, window=self, logger=self.logger) 
+        self.board = HexBoard(radius=64, grid_size=4, origin_x=self.width//2, origin_y=self.height//2, batch=self.background_batch, player=self.player, window=self) 
         
         self.hud_label = pyglet.text.Label('', font_size=48, x=10, y=10, font_name='monogram', batch=self.main_batch, group=self.font_group)
         self.level_label = pyglet.text.Label(f'Mission {self.level}', font_size=48, x=10, y=self.height-10, anchor_y='top', font_name='monogram', batch=self.main_batch, group=self.font_group)
@@ -118,5 +118,5 @@ class Hexscape(pyglet.window.Window):
         
         
 if __name__ == '__main__':
-    game = Hexscape(logging.getLogger(__name__))
+    game = Hexscape()
     pyglet.app.run()

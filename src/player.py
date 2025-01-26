@@ -6,8 +6,8 @@ import numpy as np
 
 from waypoint import Waypoint, WaypointType
 
-logging.basicConfig(filename='player.log')
-logger = logging.getLogger(__name__)
+logging.basicConfig(filename='player.log', level=logging.DEBUG)
+logger = logging.getLogger()
 
 
 class Player(pyglet.sprite.Sprite):
