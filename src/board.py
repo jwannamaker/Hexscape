@@ -13,6 +13,8 @@ from waypoint import WaypointType, Waypoint
 from player import Player
 from resources import click_sound, fade_out, ball_image
 
+logging.basicConfig()
+
 
 class HexBoard:
     """ 

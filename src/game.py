@@ -12,7 +12,7 @@ from resources import palette, hex_icon, ball_image, intro, fade_out
 from display import WaypointDisplay, ControlDisplay, LevelStartScreen
 
 logging.basicConfig(filename='game.log', level=logging.DEBUG)
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 gl.glEnable(gl.GL_BLEND)
 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -79,6 +79,7 @@ class Hexscape(pyglet.window.Window):
         if symbol == key.P:
             screenshot_name = f'screenshot {datetime.datetime.now().strftime('%a %m-%d-%Y %H:%M')}.png'
             pyglet.image.get_buffer_manager().get_color_buffer().save(screenshot_name)
+            
             logger.log(logging.INFO, f'Screenshot saved as {screenshot_name}')
         
         if symbol in self.player_movement_controls and self.player.movable():
@@ -101,6 +102,7 @@ class Hexscape(pyglet.window.Window):
 
     def on_waypoint_discovered(self, waypoint: Waypoint):
         logger.log(logging.DEBUG, f'{waypoint.color_name()} Waypoint discovered @ {self.board.player_pos}')
+        
         self.hud_label.color = waypoint.color()
         self.hud_label.text = waypoint.ability_description()
         self.clock.schedule_interval_for_duration(self.fade_text, 0.5, 10.0, label=self.hud_label)

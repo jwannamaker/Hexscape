@@ -7,7 +7,7 @@ import numpy as np
 from waypoint import Waypoint, WaypointType
 
 logging.basicConfig(filename='player.log', level=logging.DEBUG)
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class Player(pyglet.sprite.Sprite):
@@ -43,9 +43,13 @@ class Player(pyglet.sprite.Sprite):
             self.next_position.append(pyglet.math.Vec2(*screen_position))
     
     def collect_waypoint(self, waypoint: Waypoint):
-        self.waypoint_collection[waypoint.type] = waypoint
-        logger.log(logging.DEBUG, f'Player collected a {waypoint.color_name()} waypoint')
-        logger.log(logging.DEBUG, f'Player waypoint collection now {self.waypoint_collection}')
+        if waypoint.type in self.waypoint_collection:
+            logger.log(logging.DEBUG, f'Player already has {waypoint.color_name()} waypoint. Not collected.')
+        else:
+            self.waypoint_collection[waypoint.type] = waypoint
+
+            logger.log(logging.DEBUG, f'Player collected {waypoint.color_name()} waypoint')
+            logger.log(logging.DEBUG, f'Player waypoint collection update: {self.waypoint_collection}')
     
     def activate_waypoint(self,  waypoint_type: WaypointType):
         if waypoint_type in self.waypoint_collection and waypoint_type not in self.active_waypoints:
